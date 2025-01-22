@@ -40,7 +40,6 @@ type Config struct {
 	AppConfig         AppConfig
 	LogConfig         LogConfig
 	SentryConfig      SentryConfig
-	WiremockAPIConfig WiremockAPIConfig
 	MySQLConfig       MySQLConfig
 	RedisConfig       RedisConfig
 }
@@ -61,17 +60,6 @@ type LogConfig struct {
 // SentryConfig represents the configuration of Sentry.io
 type SentryConfig struct {
 	SentryDSN string `env:"SENTRY_DSN"`
-}
-
-// WiremockAPIConfig represents the configuration of the Wiremock API
-type WiremockAPIConfig struct {
-	BaseURL                  string        `env:"WIREMOCK_API_BASE_URL,notEmpty"`
-	Path                     string        `env:"WIREMOCK_API_PATH,notEmpty"`
-	MaxConns                 int           `env:"WIREMOCK_API_MAX_CONNS,notEmpty"`
-	MaxRetry                 int           `env:"WIREMOCK_API_MAX_RETRY"`
-	Timeout                  time.Duration `env:"WIREMOCK_API_TIMEOUT,notEmpty"`
-	InsecureSkipVerify       bool          `env:"WIREMOCK_API_INSECURE_SKIP_VERIFY,notEmpty"`
-	MaxTransactionsPerSecond int           `env:"WIREMOCK_API_MAX_TRANSACTIONS_PER_SECOND"`
 }
 
 // MySQLConfig represents the configuration of the MySQL database
