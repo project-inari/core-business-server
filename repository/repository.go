@@ -13,6 +13,7 @@ import (
 // DatabaseRepository represents the repository layer functions of database repository
 type DatabaseRepository interface {
 	CreateNewBusiness(ctx context.Context, username string, entity dto.BusinessEntity) (*dto.BusinessEntity, error)
+	GetBusiness(ctx context.Context, businessName string) (*dto.BusinessEntity, error)
 }
 
 // CacheRepository represents the repository layer functions of cache repository

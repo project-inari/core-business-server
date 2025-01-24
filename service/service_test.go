@@ -14,11 +14,16 @@ import (
 
 type mockDatabaseRepository struct {
 	createNewBusinessRes *dto.BusinessEntity
+	getBusinessRes       *dto.BusinessEntity
 	err                  error
 }
 
 func (m *mockDatabaseRepository) CreateNewBusiness(_ context.Context, _ string, _ dto.BusinessEntity) (*dto.BusinessEntity, error) {
 	return m.createNewBusinessRes, m.err
+}
+
+func (m *mockDatabaseRepository) GetBusiness(_ context.Context, _ string) (*dto.BusinessEntity, error) {
+	return m.getBusinessRes, m.err
 }
 
 type mockCacheRepository struct{}

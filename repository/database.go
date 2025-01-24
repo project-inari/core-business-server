@@ -78,3 +78,14 @@ func constructSuccessDBBusinessEntity(res sql.Result, entity dto.BusinessEntity)
 		UpdatedAt:        entity.UpdatedAt,
 	}
 }
+
+func (r *databaseRepository) GetBusiness(ctx context.Context, businessName string) (*dto.BusinessEntity, error) {
+	row := r.client.QueryRowContext(ctx, "SELECT id, name, industry_type, business_type, description, phone_no, operating_hours, address, business_image_url, created_at, updated_at FROM tbl_businesses WHERE name = ?", businessName)
+
+	var entity dto.BusinessEntity
+	if err := row.Scan(&entity.ID, &entity.Name, &entity.IndustryType, &entity.BusinessType, &entity.Description, &entity.PhoneNo, &entity.OperatingHours, &entity.Address, &entity.BusinessImageURL, &entity.CreatedAt, &entity.UpdatedAt); err != nil {
+		return nil, err
+	}
+
+	return &entity, nil
+}

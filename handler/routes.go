@@ -9,4 +9,5 @@ func (h *httpHandler) initRoutes(e *echo.Echo) {
 
 	v1 := e.Group("/v1")
 	v1.POST("/create", h.CreateNewBusiness)
+	v1.GET("/inquiry/:businessName", h.BusinessInquiry)
 }

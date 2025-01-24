@@ -15,13 +15,13 @@ type CreateNewBusinessReq struct {
 
 // OperatingHours represents the operating hours of a business for the week
 type OperatingHours struct {
-	Monday    OpenTime `json:"monday" validate:"required"`
-	Tuesday   OpenTime `json:"tuesday" validate:"required"`
-	Wednesday OpenTime `json:"wednesday" validate:"required"`
-	Thursday  OpenTime `json:"thursday" validate:"required"`
-	Friday    OpenTime `json:"friday" validate:"required"`
-	Saturday  OpenTime `json:"saturday" validate:"required"`
-	Sunday    OpenTime `json:"sunday" validate:"required"`
+	Monday    OpenTime `json:"monday"`
+	Tuesday   OpenTime `json:"tuesday"`
+	Wednesday OpenTime `json:"wednesday"`
+	Thursday  OpenTime `json:"thursday"`
+	Friday    OpenTime `json:"friday"`
+	Saturday  OpenTime `json:"saturday"`
+	Sunday    OpenTime `json:"sunday"`
 }
 
 // OpenTime represents the open and close time of a business

@@ -43,3 +43,6 @@ Content-Type: application/json
     "businessImageUrl": "https://www.google.com",
     "ownerUsername": "testuser"
 }
+
+GET http://localhost:8080/v1/inquiry/testbiz1
+Content-Type: application/json
