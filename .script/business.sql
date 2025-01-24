@@ -5,7 +5,7 @@ CREATE TABLE `tbl_businesses` (
   `business_type` varchar(20) NOT NULL,
   `description` text,
   `phone_no` varchar(20) NOT NULL,
-  `operating_hours` varchar(255) DEFAULT NULL,
+  `operating_hours` longtext DEFAULT NULL,
   `address` varchar(255) DEFAULT NULL,
   `business_image_url` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
