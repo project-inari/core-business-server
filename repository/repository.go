@@ -5,13 +5,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/redis/go-redis/v9"
 	"github.com/project-inari/core-business-server/dto"
+
+	"github.com/redis/go-redis/v9"
 )
 
 // DatabaseRepository represents the repository layer functions of database repository
 type DatabaseRepository interface {
-	QueryTest() (*[]dto.TestEntity, error)
+	CreateNewBusiness(ctx context.Context, username string, entity dto.BusinessEntity) (*dto.BusinessEntity, error)
 }
 
 // CacheRepository represents the repository layer functions of cache repository

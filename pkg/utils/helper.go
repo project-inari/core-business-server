@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -8,8 +9,8 @@ import (
 	"time"
 )
 
-// EncodeJSONtoBytes encodes an object to a JSON bytes array
-func EncodeJSONtoBytes(obj any) string {
+// EncodeJSONtoString encodes an object to a JSON bytes array
+func EncodeJSONtoString(obj any) string {
 	data, err := json.Marshal(obj)
 	if err != nil {
 		slog.Error("[utils.EncodeJSONtoBytes] unable to encode JSON", slog.Any("error", err))
@@ -25,6 +26,11 @@ func DecodeJSONfromString[T any](data string) *T {
 	}
 
 	return obj
+}
+
+// EncodeBase64String encodes a string to base64
+func EncodeBase64String(s string) string {
+	return base64.StdEncoding.EncodeToString([]byte(s))
 }
 
 // Debug prints the object in a pretty format

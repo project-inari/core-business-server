@@ -8,5 +8,5 @@ func (h *httpHandler) initRoutes(e *echo.Echo) {
 	e.GET("/health", h.HealthCheck)
 
 	v1 := e.Group("/v1")
-	_ = v1
+	v1.POST("/create", h.CreateNewBusiness)
 }

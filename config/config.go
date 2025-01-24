@@ -37,11 +37,11 @@ func New() *Config {
 
 // Config represents the configuration of the server
 type Config struct {
-	AppConfig         AppConfig
-	LogConfig         LogConfig
-	SentryConfig      SentryConfig
-	MySQLConfig       MySQLConfig
-	RedisConfig       RedisConfig
+	AppConfig    AppConfig
+	LogConfig    LogConfig
+	SentryConfig SentryConfig
+	MySQLConfig  MySQLConfig
+	RedisConfig  RedisConfig
 }
 
 // AppConfig represents the configuration of the application
