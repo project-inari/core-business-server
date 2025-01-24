@@ -8,15 +8,15 @@ import (
 )
 
 func (s *service) BusinessInquiry(ctx context.Context, businessName string) (*dto.BusinessInquiryRes, error) {
-	qureyRes, err := s.databaseRepository.GetBusiness(ctx, businessName)
+	queryRes, err := s.databaseRepository.GetBusiness(ctx, businessName)
 	if err != nil {
 		return nil, err
 	}
 
-	return constructBusinessInquiryRes(qureyRes), nil
+	return constructBusinessInquiryRes(*queryRes), nil
 }
 
-func constructBusinessInquiryRes(entity *dto.BusinessEntity) *dto.BusinessInquiryRes {
+func constructBusinessInquiryRes(entity dto.BusinessEntity) *dto.BusinessInquiryRes {
 	operatingHours := utils.DecodeJSONfromString[dto.OperatingHours](entity.OperatingHours)
 
 	return &dto.BusinessInquiryRes{
