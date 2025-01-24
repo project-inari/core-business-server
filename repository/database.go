@@ -1,9 +1,14 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/project-inari/core-business-server/dto"
+)
+
+const (
+	roleOwner = "OWNER"
 )
 
 type databaseRepository struct {
@@ -29,34 +34,47 @@ func NewDatabaseRepository(c DatabaseRepositoryConfig, d DatabaseRepositoryDepen
 	}
 }
 
-// QueryTest returns the test rows queried from test table
-func (r *databaseRepository) QueryTest() (*[]dto.TestEntity, error) {
-	tests := []dto.TestEntity{}
-
-	query := `
-		SELECT * FROM tbl_test;
-	`
-
-	rows, err := r.client.Query(query)
+func (r *databaseRepository) CreateNewBusiness(ctx context.Context, username string, entity dto.BusinessEntity) (*dto.BusinessEntity, error) {
+	tx, err := r.client.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		if err := rows.Close(); err != nil {
-			return
-		}
-	}()
+	defer tx.Rollback() // nolint: errcheck
 
-	for rows.Next() {
-		test := dto.TestEntity{}
-		if err := rows.Scan(&test.ID, &test.Message); err != nil {
-			return nil, err
-		}
-		tests = append(tests, test)
-	}
-	if err := rows.Err(); err != nil {
+	businessRes, err := tx.ExecContext(ctx, "INSERT INTO tbl_businesses (name, industry_type, business_type, description, phone_no, operating_hours, address, business_image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", entity.Name, entity.IndustryType, entity.BusinessType, entity.Description, entity.PhoneNo, entity.OperatingHours, entity.Address, entity.BusinessImageURL)
+	if err != nil {
 		return nil, err
 	}
 
-	return &tests, nil
+	_, err = tx.ExecContext(ctx, "INSERT INTO tbl_business_members (business_name, username, role) VALUES (?, ?, ?)", entity.Name, username, roleOwner)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return constructSuccessDBBusinessEntity(businessRes, entity), nil
+}
+
+func constructSuccessDBBusinessEntity(res sql.Result, entity dto.BusinessEntity) *dto.BusinessEntity {
+	businessID, err := res.LastInsertId()
+	if err != nil {
+		return nil
+	}
+
+	return &dto.BusinessEntity{
+		ID:               int(businessID),
+		Name:             entity.Name,
+		IndustryType:     entity.IndustryType,
+		BusinessType:     entity.BusinessType,
+		Description:      entity.Description,
+		PhoneNo:          entity.PhoneNo,
+		OperatingHours:   entity.OperatingHours,
+		Address:          entity.Address,
+		BusinessImageURL: entity.BusinessImageURL,
+		CreatedAt:        entity.CreatedAt,
+		UpdatedAt:        entity.UpdatedAt,
+	}
 }

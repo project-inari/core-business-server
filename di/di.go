@@ -12,7 +12,6 @@ import (
 
 	"github.com/project-inari/core-business-server/config"
 	"github.com/project-inari/core-business-server/handler"
-	"github.com/project-inari/core-business-server/pkg/httpclient"
 	"github.com/project-inari/core-business-server/repository"
 	"github.com/project-inari/core-business-server/service"
 )
@@ -35,15 +34,6 @@ func New(c *config.Config) {
 	// Echo server initialization
 	e := echo.New()
 	setupServer(ctx, e, c)
-
-	// HTTP Client initialization
-	httpClientWiremock := httpclient.NewHTTPClient(httpclient.Options{
-		MaxConns:                 c.WiremockAPIConfig.MaxConns,
-		MaxRetry:                 c.WiremockAPIConfig.MaxRetry,
-		Timeout:                  c.WiremockAPIConfig.Timeout,
-		InsecureSkipVerify:       c.WiremockAPIConfig.InsecureSkipVerify,
-		MaxTransactionsPerSecond: c.WiremockAPIConfig.MaxTransactionsPerSecond,
-	})
 
 	// MySQL initialization
 	mysqlDB, err := newMySQL(mySQLOptions{
@@ -83,15 +73,6 @@ func New(c *config.Config) {
 	}()
 
 	// Repository initialization
-	exampleRepo := repository.NewExampleRepository(repository.ExampleRepositoryConfig{})
-
-	wiremockAPIRepo := repository.NewWiremockAPIRepository(repository.WiremockAPIRepositoryConfig{
-		BaseURL: c.WiremockAPIConfig.BaseURL,
-		Path:    c.WiremockAPIConfig.Path,
-	}, repository.WiremockAPIRepositoryDependencies{
-		Client: httpClientWiremock,
-	})
-
 	databaseRepo := repository.NewDatabaseRepository(repository.DatabaseRepositoryConfig{
 		Database: c.MySQLConfig.Database,
 	}, repository.DatabaseRepositoryDependencies{
@@ -104,10 +85,8 @@ func New(c *config.Config) {
 
 	// Service initialization
 	service := service.New(service.Dependencies{
-		ExampleRepository:     exampleRepo,
-		WiremockAPIRepository: wiremockAPIRepo,
-		DatabaseRepository:    databaseRepo,
-		CacheRepository:       cacheRepo,
+		DatabaseRepository: databaseRepo,
+		CacheRepository:    cacheRepo,
 	})
 
 	// Handler initialization

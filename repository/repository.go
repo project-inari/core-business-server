@@ -5,24 +5,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/redis/go-redis/v9"
 	"github.com/project-inari/core-business-server/dto"
-	"github.com/project-inari/core-business-server/pkg/httpclient"
+
+	"github.com/redis/go-redis/v9"
 )
-
-// ExampleRepository represents the repository layer functions of example repository
-type ExampleRepository interface {
-	DoExample(ctx context.Context) (string, error)
-}
-
-// WiremockAPIRepository represents the repository layer functions of wiremock API repository
-type WiremockAPIRepository interface {
-	GetTest(ctx context.Context, h dto.WiremockGetTestHeader) (*httpclient.Response[dto.WiremockGetTestResponse], error)
-}
 
 // DatabaseRepository represents the repository layer functions of database repository
 type DatabaseRepository interface {
-	QueryTest() (*[]dto.TestEntity, error)
+	CreateNewBusiness(ctx context.Context, username string, entity dto.BusinessEntity) (*dto.BusinessEntity, error)
 }
 
 // CacheRepository represents the repository layer functions of cache repository
