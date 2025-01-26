@@ -46,7 +46,6 @@ func (r *cacheRepository) Set(ctx context.Context, key string, value interface{}
 
 func (r *cacheRepository) UpdateUserCacheNewBusinessJoined(ctx context.Context, ownerUsername string, business dto.BusinessInquiryRes) error {
 	key := fmt.Sprintf("%s:%s", r.keyUserVerifiedAccount, ownerUsername)
-	fmt.Println(key)
 
 	remainingTTL, err := r.client.TTL(ctx, key).Result()
 	if err != nil {
