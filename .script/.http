@@ -1,7 +1,7 @@
 POST http://localhost:8080/v1/create
 Content-Type: application/json
 {
-    "name": "testbiz1",
+    "name": "test1",
     "industryType": "IT",
     "businessType": "Retail",
     "description": "This is a test business",
@@ -41,7 +41,7 @@ Content-Type: application/json
     },
     "address": "123/456",
     "businessImageUrl": "https://www.google.com",
-    "ownerUsername": "testuser"
+    "ownerUsername": "test1"
 }
 
 GET http://localhost:8080/v1/inquiry/testbiz1

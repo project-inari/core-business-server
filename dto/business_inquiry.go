@@ -1,5 +1,6 @@
 package dto
 
+// BusinessInquiryRes represents the response of business inquiry
 type BusinessInquiryRes struct {
 	ID               int            `json:"id"`
 	Name             string         `json:"name"`

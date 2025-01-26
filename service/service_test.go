@@ -36,6 +36,10 @@ func (m *mockCacheRepository) Set(_ context.Context, _ string, _ interface{}, _ 
 	return nil
 }
 
+func (m *mockCacheRepository) UpdateUserCacheNewBusinessJoined(_ context.Context, _ string, _ dto.BusinessInquiryRes) error {
+	return nil
+}
+
 const (
 	mockName             = "mockName"
 	mockIndustryType     = "mockIndustryType"

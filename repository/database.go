@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/project-inari/core-business-server/dto"
 )
@@ -74,8 +75,8 @@ func constructSuccessDBBusinessEntity(res sql.Result, entity dto.BusinessEntity)
 		OperatingHours:   entity.OperatingHours,
 		Address:          entity.Address,
 		BusinessImageURL: entity.BusinessImageURL,
-		CreatedAt:        entity.CreatedAt,
-		UpdatedAt:        entity.UpdatedAt,
+		CreatedAt:        time.Now().Format(time.RFC3339),
+		UpdatedAt:        time.Now().Format(time.RFC3339),
 	}
 }
 
