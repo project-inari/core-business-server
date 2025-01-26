@@ -76,9 +76,11 @@ type MySQLConfig struct {
 
 // RedisConfig represents the configuration of the Redis cache
 type RedisConfig struct {
-	Host     string        `env:"REDIS_HOST,notEmpty"`
-	Password string        `env:"REDIS_PASSWORD,notEmpty"`
-	Timeout  time.Duration `env:"REDIS_TIMEOUT,notEmpty"`
-	MaxRetry int           `env:"REDIS_MAX_RETRY,notEmpty"`
-	PoolSize int           `env:"REDIS_POOL_SIZE,notEmpty"`
+	Host                   string        `env:"REDIS_HOST,notEmpty"`
+	Password               string        `env:"REDIS_PASSWORD,notEmpty"`
+	Timeout                time.Duration `env:"REDIS_TIMEOUT,notEmpty"`
+	MaxRetry               int           `env:"REDIS_MAX_RETRY,notEmpty"`
+	PoolSize               int           `env:"REDIS_POOL_SIZE,notEmpty"`
+	DB                     int           `env:"REDIS_DB,notEmpty"`
+	KeyUserVerifiedAccount string        `env:"REDIS_KEY_USER_VERIFIED_ACCOUNT,notEmpty"`
 }

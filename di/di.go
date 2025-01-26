@@ -62,6 +62,7 @@ func New(c *config.Config) {
 		timeout:  c.RedisConfig.Timeout,
 		maxRetry: c.RedisConfig.MaxRetry,
 		poolSize: c.RedisConfig.PoolSize,
+		db:       c.RedisConfig.DB,
 	})
 	if err != nil {
 		log.Panicf("error - [main.New] unable to connect to Redis: %v", err)
@@ -79,7 +80,9 @@ func New(c *config.Config) {
 		Client: mysqlDB.client,
 	})
 
-	cacheRepo := repository.NewCacheRepository(repository.CacheRepositoryConfig{}, repository.CacheRepositoryDependencies{
+	cacheRepo := repository.NewCacheRepository(repository.CacheRepositoryConfig{
+		KeyUserVerifiedAccount: c.RedisConfig.KeyUserVerifiedAccount,
+	}, repository.CacheRepositoryDependencies{
 		Client: redisClient.client,
 	})
 

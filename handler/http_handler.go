@@ -37,3 +37,20 @@ func (h *httpHandler) CreateNewBusiness(c echo.Context) error {
 
 	return response.SuccessResponse(c, http.StatusOK, res)
 }
+
+// BusinessInquiry retrieves a business information
+func (h *httpHandler) BusinessInquiry(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	businessName := c.Param("businessName")
+	if businessName == "" {
+		return response.ErrorResponse(c, http.StatusBadRequest, "error - [BusinessInquiry] bad request: business name is required", "")
+	}
+
+	res, err := h.d.Service.BusinessInquiry(ctx, businessName)
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [BusinessInquiry] internal server error: %v", err), "")
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}

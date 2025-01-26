@@ -11,6 +11,7 @@ import (
 // Port represents the service layer functions
 type Port interface {
 	CreateNewBusiness(ctx context.Context, req dto.CreateNewBusinessReq) (*dto.CreateNewBusinessRes, error)
+	BusinessInquiry(ctx context.Context, businessName string) (*dto.BusinessInquiryRes, error)
 }
 
 type service struct {
