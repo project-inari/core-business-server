@@ -26,18 +26,22 @@ func (m *mockDatabaseRepository) GetBusiness(_ context.Context, _ string) (*dto.
 	return m.getBusinessRes, m.err
 }
 
-type mockCacheRepository struct{}
+type mockCacheRepository struct {
+	getRes *redis.StringCmd
+	setRes *redis.StatusCmd
+	err    error
+}
 
 func (m *mockCacheRepository) Get(_ context.Context, _ string) *redis.StringCmd {
-	return nil
+	return m.getRes
 }
 
 func (m *mockCacheRepository) Set(_ context.Context, _ string, _ interface{}, _ time.Duration) *redis.StatusCmd {
-	return nil
+	return m.setRes
 }
 
 func (m *mockCacheRepository) UpdateUserCacheNewBusinessJoined(_ context.Context, _ string, _ dto.BusinessInquiryRes) error {
-	return nil
+	return m.err
 }
 
 const (
@@ -109,7 +113,9 @@ func TestCreateNewBusiness(t *testing.T) {
 	}
 
 	t.Run("success", func(t *testing.T) {
-		mockCacheRepository := &mockCacheRepository{}
+		mockCacheRepository := &mockCacheRepository{
+			err: nil,
+		}
 		mockDatabaseRepository := &mockDatabaseRepository{
 			createNewBusinessRes: &dto.BusinessEntity{
 				ID:               1,
@@ -139,6 +145,35 @@ func TestCreateNewBusiness(t *testing.T) {
 		mockCacheRepository := &mockCacheRepository{}
 		mockDatabaseRepository := &mockDatabaseRepository{
 			err: errors.New("error"),
+		}
+
+		s := &service{
+			databaseRepository: mockDatabaseRepository,
+			cacheRepository:    mockCacheRepository,
+		}
+
+		res, err := s.CreateNewBusiness(ctx, req)
+
+		assert.Error(t, err)
+		assert.Nil(t, res)
+	})
+
+	t.Run("error - when cache repo returned error", func(t *testing.T) {
+		mockCacheRepository := &mockCacheRepository{
+			err: errors.New("error"),
+		}
+		mockDatabaseRepository := &mockDatabaseRepository{
+			createNewBusinessRes: &dto.BusinessEntity{
+				ID:               1,
+				Name:             mockName,
+				IndustryType:     mockIndustryType,
+				BusinessType:     mockBusinessType,
+				Description:      mockDescription,
+				PhoneNo:          mockPhoneNo,
+				OperatingHours:   mockOperatingHours,
+				Address:          mockAddress,
+				BusinessImageURL: mockBusinessImageURL,
+			},
 		}
 
 		s := &service{
