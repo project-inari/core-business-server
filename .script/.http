@@ -1,7 +1,7 @@
 POST http://localhost:8080/v1/create
 Content-Type: application/json
 {
-    "name": "test1",
+    "name": "testbiz1",
     "industryType": "IT",
     "businessType": "Retail",
     "description": "This is a test business",

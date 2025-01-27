@@ -40,7 +40,7 @@ func (m *mockCacheRepository) Set(_ context.Context, _ string, _ interface{}, _ 
 	return m.setRes
 }
 
-func (m *mockCacheRepository) UpdateUserCacheNewBusinessJoined(_ context.Context, _ string, _ dto.BusinessInquiryRes) error {
+func (m *mockCacheRepository) UpdateUserCacheNewBusinessJoined(_ context.Context, _ string, _ dto.BusinessCacheModel) error {
 	return m.err
 }
 

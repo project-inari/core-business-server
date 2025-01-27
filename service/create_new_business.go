@@ -7,6 +7,10 @@ import (
 	"github.com/project-inari/core-business-server/pkg/utils"
 )
 
+const (
+	roleOwner = "OWNER"
+)
+
 func (s *service) CreateNewBusiness(ctx context.Context, req dto.CreateNewBusinessReq) (*dto.CreateNewBusinessRes, error) {
 	businessEntity := dto.BusinessEntity{
 		Name:             req.Name,
@@ -24,7 +28,7 @@ func (s *service) CreateNewBusiness(ctx context.Context, req dto.CreateNewBusine
 		return nil, err
 	}
 
-	if err := s.cacheRepository.UpdateUserCacheNewBusinessJoined(ctx, req.OwnerUsername, dto.BusinessInquiryRes{
+	if err := s.cacheRepository.UpdateUserCacheNewBusinessJoined(ctx, req.OwnerUsername, dto.BusinessCacheModel{
 		ID:               businessRes.ID,
 		Name:             businessRes.Name,
 		IndustryType:     businessRes.IndustryType,
@@ -36,6 +40,7 @@ func (s *service) CreateNewBusiness(ctx context.Context, req dto.CreateNewBusine
 		BusinessImageURL: businessRes.BusinessImageURL,
 		CreatedAt:        businessRes.CreatedAt,
 		UpdatedAt:        businessRes.UpdatedAt,
+		UserRole:         roleOwner,
 	}); err != nil {
 		return nil, err
 	}

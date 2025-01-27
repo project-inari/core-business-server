@@ -20,5 +20,5 @@ type DatabaseRepository interface {
 type CacheRepository interface {
 	Get(ctx context.Context, key string) *redis.StringCmd
 	Set(ctx context.Context, key string, value interface{}, ttl time.Duration) *redis.StatusCmd
-	UpdateUserCacheNewBusinessJoined(ctx context.Context, ownerUsername string, business dto.BusinessInquiryRes) error
+	UpdateUserCacheNewBusinessJoined(ctx context.Context, ownerUsername string, business dto.BusinessCacheModel) error
 }
