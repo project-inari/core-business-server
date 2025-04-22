@@ -55,3 +55,69 @@ func (h *httpHandler) BusinessInquiry(c echo.Context) error {
 
 	return response.SuccessResponse(c, http.StatusOK, res)
 }
+
+func (h *httpHandler) CreateNewCategory(c echo.Context) error {
+	ctx := c.Request().Context()
+	wrapper := request.ContextWrapper(c)
+
+	req := new(dto.CreateNewCategoryReq)
+	if err := wrapper.Bind(req); err != nil {
+		return response.ErrorResponse(c, http.StatusBadRequest, fmt.Sprintf("error - [CreateNewCategory] bad request: %v", err), "")
+	}
+
+	res, err := h.d.Service.CreateNewCategory(ctx, *req)
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [CreateNewCategory] internal server error: %v", err), "")
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}
+
+func (h *httpHandler) ListBusinessCategories(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	businessID := c.Param("businessID")
+	if businessID == "" {
+		return response.ErrorResponse(c, http.StatusBadRequest, "error - [ListBusinessCategories] bad request: business name is required", "")
+	}
+
+	res, err := h.d.Service.ListBusinessCategories(ctx, utils.ConvertStringToInt(businessID))
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [ListBusinessCategories] internal server error: %v", err), "")
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}
+
+func (h *httpHandler) CreateNewTag(c echo.Context) error {
+	ctx := c.Request().Context()
+	wrapper := request.ContextWrapper(c)
+
+	req := new(dto.CreateNewTagReq)
+	if err := wrapper.Bind(req); err != nil {
+		return response.ErrorResponse(c, http.StatusBadRequest, fmt.Sprintf("error - [CreateNewTag] bad request: %v", err), "")
+	}
+
+	res, err := h.d.Service.CreateNewTag(ctx, *req)
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [CreateNewTag] internal server error: %v", err), "")
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}
+
+func (h *httpHandler) ListBusinessTags(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	businessID := c.Param("businessID")
+	if businessID == "" {
+		return response.ErrorResponse(c, http.StatusBadRequest, "error - [ListBusinessTags] bad request: business name is required", "")
+	}
+
+	res, err := h.d.Service.ListBusinessTags(ctx, utils.ConvertStringToInt(businessID))
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [ListBusinessTags] internal server error: %v", err), "")
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}

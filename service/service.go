@@ -12,6 +12,10 @@ import (
 type Port interface {
 	CreateNewBusiness(ctx context.Context, req dto.CreateNewBusinessReq) (*dto.CreateNewBusinessRes, error)
 	BusinessInquiry(ctx context.Context, businessID int) (*dto.BusinessInquiryRes, error)
+	CreateNewCategory(ctx context.Context, req dto.CreateNewCategoryReq) (*dto.CreateNewCategoryRes, error)
+	ListBusinessCategories(ctx context.Context, businessID int) (*dto.ListBusinessCategoriesRes, error)
+	CreateNewTag(ctx context.Context, req dto.CreateNewTagReq) (*dto.CreateNewTagRes, error)
+	ListBusinessTags(ctx context.Context, businessID int) (*dto.ListBusinessTagsRes, error)
 }
 
 type service struct {

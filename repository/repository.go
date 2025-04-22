@@ -14,6 +14,12 @@ import (
 type DatabaseRepository interface {
 	CreateNewBusiness(ctx context.Context, username string, entity dto.BusinessEntity) (*dto.BusinessEntity, error)
 	GetBusiness(ctx context.Context, businessID int) (*dto.BusinessEntity, error)
+	CreateNewCategory(ctx context.Context, entity dto.BusinessCategoryEntity) (int, error)
+	ListBusinessCategories(ctx context.Context, businessID int) ([]dto.BusinessCategoryEntity, error)
+	CreateNewTag(ctx context.Context, entity dto.BusinessTagEntity) (int, error)
+	ListBusinessTags(ctx context.Context, businessID int) ([]dto.BusinessTagEntity, error)
+	AddTagsToCategory(ctx context.Context, tagIds []int, categoryID int) error
+	ListCategoryTags(ctx context.Context, categoryID int) ([]dto.BusinessTagEntity, error)
 }
 
 // CacheRepository represents the repository layer functions of cache repository

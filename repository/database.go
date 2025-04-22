@@ -96,8 +96,32 @@ func (r *databaseRepository) GetBusiness(ctx context.Context, businessID int) (*
 	return &entity, nil
 }
 
+func (r *databaseRepository) CreateNewCategory(ctx context.Context, entity dto.BusinessCategoryEntity) (int, error) {
+	tx, err := r.client.BeginTx(ctx, nil)
+	if err != nil {
+		return -1, err
+	}
+	defer tx.Rollback() // nolint: errcheck
+
+	categoryRes, err := tx.ExecContext(ctx, "INSERT INTO tbl_categories (business_id, category_name, category_picture_url, description, parent_category_id) VALUES (?, ?, ?, ?, ?)", entity.BusinessID, entity.CategoryName, entity.CategoryPictureURL, entity.Description, entity.ParentCategoryID)
+	if err != nil {
+		return -1, err
+	}
+
+	categoryResID, err := categoryRes.LastInsertId()
+	if err != nil {
+		return -1, err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return -1, err
+	}
+
+	return int(categoryResID), nil
+}
+
 func (r *databaseRepository) ListBusinessCategories(ctx context.Context, businessID int) ([]dto.BusinessCategoryEntity, error) {
-	rows, err := r.client.QueryContext(ctx, "SELECT id, business_id, category_name, category_picture_url, description, parent_category_id, created_at, updated_at FROM tbl_business_categories WHERE business_id = ?", businessID)
+	rows, err := r.client.QueryContext(ctx, "SELECT id, category_name, category_picture_url, description, parent_category_id, created_at, updated_at FROM tbl_categories WHERE business_id = ?", businessID)
 	if err != nil {
 		return nil, err
 	}
@@ -106,11 +130,94 @@ func (r *databaseRepository) ListBusinessCategories(ctx context.Context, busines
 	var categories []dto.BusinessCategoryEntity
 	for rows.Next() {
 		var category dto.BusinessCategoryEntity
-		if err := rows.Scan(&category.ID, &category.BusinessID, &category.CategoryName, &category.CategoryPictureURL, &category.Description, &category.ParentCategoryID, &category.CreatedAt, &category.UpdatedAt); err != nil {
+		if err := rows.Scan(&category.ID, &category.CategoryName, &category.CategoryPictureURL, &category.Description, &category.ParentCategoryID, &category.CreatedAt, &category.UpdatedAt); err != nil {
 			return nil, err
 		}
 		categories = append(categories, category)
 	}
 
 	return categories, nil
+}
+
+func (r *databaseRepository) CreateNewTag(ctx context.Context, entity dto.BusinessTagEntity) (int, error) {
+	tx, err := r.client.BeginTx(ctx, nil)
+	if err != nil {
+		return -1, err
+	}
+	defer tx.Rollback() // nolint: errcheck
+
+	tagRes, err := tx.ExecContext(ctx, "INSERT INTO tbl_tags (business_id, tag_name, color) VALUES (?, ?, ?)", entity.BusinessID, entity.TagName, entity.Color)
+	if err != nil {
+		return -1, err
+	}
+
+	tagResID, err := tagRes.LastInsertId()
+	if err != nil {
+		return -1, err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return -1, err
+	}
+
+	return int(tagResID), nil
+}
+
+func (r *databaseRepository) ListBusinessTags(ctx context.Context, businessID int) ([]dto.BusinessTagEntity, error) {
+	rows, err := r.client.QueryContext(ctx, "SELECT id, tag_name, color, created_at, updated_at FROM tbl_tags WHERE business_id = ?", businessID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tags []dto.BusinessTagEntity
+	for rows.Next() {
+		var tag dto.BusinessTagEntity
+		if err := rows.Scan(&tag.ID, &tag.TagName, &tag.Color, &tag.CreatedAt, &tag.UpdatedAt); err != nil {
+			return nil, err
+		}
+		tags = append(tags, tag)
+	}
+
+	return tags, nil
+}
+
+func (r *databaseRepository) AddTagsToCategory(ctx context.Context, tagIds []int, categoryID int) error {
+	tx, err := r.client.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback() // nolint: errcheck
+
+	for _, tagID := range tagIds {
+		_, err := tx.ExecContext(ctx, "INSERT INTO tbl_category_tags (category_id, tag_id) VALUES (?, ?)", categoryID, tagID)
+		if err != nil {
+			return err
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *databaseRepository) ListCategoryTags(ctx context.Context, categoryID int) ([]dto.BusinessTagEntity, error) {
+	rows, err := r.client.QueryContext(ctx, "SELECT DISTINCT t.id, t.business_id, t.tag_name, t.color, t.created_at, t.updated_at FROM tbl_tags t JOIN tbl_category_tags ct ON t.id = ct.tag_id WHERE ct.category_id = ?", categoryID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tags []dto.BusinessTagEntity
+	for rows.Next() {
+		var tag dto.BusinessTagEntity
+		if err := rows.Scan(&tag.ID, &tag.BusinessID, &tag.TagName, &tag.Color, &tag.CreatedAt, &tag.UpdatedAt); err != nil {
+			return nil, err
+		}
+		tags = append(tags, tag)
+	}
+
+	return tags, nil
 }
