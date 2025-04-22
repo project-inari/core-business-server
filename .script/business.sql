@@ -99,6 +99,7 @@ CREATE TABLE `tbl_suppliers` (
   `business_id` int NOT NULL,
   `name` varchar(255) NOT NULL,
   `type` varchar(50) DEFAULT NULL,
+  `description` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -172,20 +173,14 @@ CREATE TABLE `tbl_customer_orders` (
 
 CREATE TABLE `tbl_products` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `sku_no` varchar(50) DEFAULT NULL,
   `business_id` int NOT NULL,
   `supplier_id` int DEFAULT NULL,
   `item_name` varchar(255) DEFAULT NULL,
-  `variant_name` varchar(255) DEFAULT NULL,
-  `note` text,
-  `base_selling_price` decimal(10,2) DEFAULT NULL,
-  `base_purchase_price` decimal(10,2) DEFAULT NULL,
   `brand` varchar(100) DEFAULT NULL,
   `category_id` int NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_sku_no` (`business_id`,`sku_no`),
   KEY `supplier_id` (`supplier_id`),
   KEY `category_id` (`category_id`),
   CONSTRAINT `tbl_products_ibfk_1` FOREIGN KEY (`business_id`) REFERENCES `tbl_businesses` (`id`) ON DELETE CASCADE,
@@ -193,6 +188,24 @@ CREATE TABLE `tbl_products` (
   CONSTRAINT `tbl_products_ibfk_3` FOREIGN KEY (`category_id`) REFERENCES `tbl_categories` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- business.tbl_product_variants definition
+
+CREATE TABLE `tbl_product_variants` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `product_id` int NOT NULL,
+  `business_id` int NOT NULL,
+  `variant_name` varchar(255) DEFAULT NULL,
+  `sku_no` varchar(50) DEFAULT NULL,
+  `picture_url` text DEFAULT NULL,
+  `base_selling_price` decimal(10,2) DEFAULT NULL,
+  `base_purchase_price` decimal(10,2) pDEFAULT NULL,
+  `note` text,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_sku_per_business` (`business_id`, `sku_no`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `tbl_product_variants_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `tbl_products` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tbl_product_variants_ibfk_2` FOREIGN KEY (`business_id`) REFERENCES `tbl_businesses` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- business.tbl_stock_movements definition
 
@@ -211,16 +224,17 @@ CREATE TABLE `tbl_stock_movements` (
   CONSTRAINT `tbl_stock_movements_ibfk_2` FOREIGN KEY (`to_warehouse_id`) REFERENCES `tbl_warehouses` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-
 -- business.tbl_supplier_contact definition
 
 CREATE TABLE `tbl_supplier_contact` (
   `id` int NOT NULL AUTO_INCREMENT,
   `supplier_id` int NOT NULL,
   `full_name` varchar(100) NOT NULL,
-  `contact` longtext,
-  `address` text,
-  `remarks` text,
+  `email` varchar(100) DEFAULT NULL,
+  `phone_no` varchar(50) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `status` varchar(50) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -253,14 +267,14 @@ CREATE TABLE `tbl_supplier_orders` (
 
 CREATE TABLE `tbl_customer_order_products` (
   `customer_order_id` int NOT NULL,
-  `product_id` int NOT NULL,
+  `variant_id` int NOT NULL,
   `selling_price_per_unit` decimal(10,2) DEFAULT NULL,
   `quantity` int DEFAULT NULL,
   `discount` decimal(10,2) DEFAULT NULL,
-  PRIMARY KEY (`customer_order_id`,`product_id`),
-  KEY `product_id` (`product_id`),
+  PRIMARY KEY (`customer_order_id`, `variant_id`),
+  KEY `variant_id` (`variant_id`),
   CONSTRAINT `tbl_customer_order_products_ibfk_1` FOREIGN KEY (`customer_order_id`) REFERENCES `tbl_customer_orders` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `tbl_customer_order_products_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `tbl_products` (`id`) ON DELETE CASCADE
+  CONSTRAINT `tbl_customer_order_products_ibfk_2` FOREIGN KEY (`variant_id`) REFERENCES `tbl_product_variants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -270,16 +284,16 @@ CREATE TABLE `tbl_inventory` (
   `id` int NOT NULL AUTO_INCREMENT,
   `business_id` int NOT NULL,
   `warehouse_id` int NOT NULL,
-  `product_id` int NOT NULL,
+  `variant_id` int NOT NULL,
   `quantity` int NOT NULL DEFAULT '0',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_inventory` (`business_id`,`warehouse_id`,`product_id`),
+  UNIQUE KEY `unique_inventory` (`business_id`, `warehouse_id`, `variant_id`),
   KEY `warehouse_id` (`warehouse_id`),
-  KEY `product_id` (`product_id`),
+  KEY `variant_id` (`variant_id`),
   CONSTRAINT `tbl_inventory_ibfk_1` FOREIGN KEY (`business_id`) REFERENCES `tbl_businesses` (`id`) ON DELETE CASCADE,
   CONSTRAINT `tbl_inventory_ibfk_2` FOREIGN KEY (`warehouse_id`) REFERENCES `tbl_warehouses` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `tbl_inventory_ibfk_3` FOREIGN KEY (`product_id`) REFERENCES `tbl_products` (`id`) ON DELETE CASCADE
+  CONSTRAINT `tbl_inventory_ibfk_3` FOREIGN KEY (`variant_id`) REFERENCES `tbl_product_variants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -287,12 +301,12 @@ CREATE TABLE `tbl_inventory` (
 
 CREATE TABLE `tbl_product_stock_movement` (
   `stock_movement_id` int NOT NULL,
-  `product_id` int NOT NULL,
+  `variant_id` int NOT NULL,
   `quantity` int NOT NULL,
-  PRIMARY KEY (`stock_movement_id`,`product_id`),
-  KEY `product_id` (`product_id`),
+  PRIMARY KEY (`stock_movement_id`, `variant_id`),
+  KEY `variant_id` (`variant_id`),
   CONSTRAINT `tbl_product_stock_movement_ibfk_1` FOREIGN KEY (`stock_movement_id`) REFERENCES `tbl_stock_movements` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `tbl_product_stock_movement_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `tbl_products` (`id`) ON DELETE CASCADE
+  CONSTRAINT `tbl_product_stock_movement_ibfk_2` FOREIGN KEY (`variant_id`) REFERENCES `tbl_product_variants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -308,15 +322,27 @@ CREATE TABLE `tbl_product_tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
+-- business.tbl_category_tags definition
+
+CREATE TABLE `tbl_category_tags` (
+  `category_id` int NOT NULL,
+  `tag_id` int NOT NULL,
+  PRIMARY KEY (`category_id`,`tag_id`),
+  KEY `tag_id` (`tag_id`),
+  CONSTRAINT `tbl_category_tags_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `tbl_categories` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tbl_category_tags_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `tbl_tags` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 -- business.tbl_supplier_order_products definition
 
 CREATE TABLE `tbl_supplier_order_products` (
   `supplier_order_id` int NOT NULL,
-  `product_id` int NOT NULL,
+  `variant_id` int NOT NULL,
   `price_per_unit` decimal(10,2) DEFAULT NULL,
   `quantity` int DEFAULT NULL,
-  PRIMARY KEY (`supplier_order_id`,`product_id`),
-  KEY `product_id` (`product_id`),
+  PRIMARY KEY (`supplier_order_id`, `variant_id`),
+  KEY `variant_id` (`variant_id`),
   CONSTRAINT `tbl_supplier_order_products_ibfk_1` FOREIGN KEY (`supplier_order_id`) REFERENCES `tbl_supplier_orders` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `tbl_supplier_order_products_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `tbl_products` (`id`) ON DELETE CASCADE
+  CONSTRAINT `tbl_supplier_order_products_ibfk_2` FOREIGN KEY (`variant_id`) REFERENCES `tbl_product_variants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

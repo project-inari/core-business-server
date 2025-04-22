@@ -2,6 +2,7 @@ package dto
 
 // CreateNewBusinessReq represents the request body for creating a new business
 type CreateNewBusinessReq struct {
+	
 	Name             string         `json:"name" validate:"required"`
 	IndustryType     string         `json:"industryType" validate:"required"`
 	BusinessType     string         `json:"businessType" validate:"required"`

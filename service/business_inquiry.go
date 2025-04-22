@@ -7,8 +7,8 @@ import (
 	"github.com/project-inari/core-business-server/pkg/utils"
 )
 
-func (s *service) BusinessInquiry(ctx context.Context, businessName string) (*dto.BusinessInquiryRes, error) {
-	queryRes, err := s.databaseRepository.GetBusiness(ctx, businessName)
+func (s *service) BusinessInquiry(ctx context.Context, businessID int) (*dto.BusinessInquiryRes, error) {
+	queryRes, err := s.databaseRepository.GetBusiness(ctx, businessID)
 	if err != nil {
 		return nil, err
 	}

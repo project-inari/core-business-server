@@ -17,21 +17,33 @@ type BusinessEntity struct {
 
 // BusinessMemberEntity represents the business member entity in the database for table tbl_business_members
 type BusinessMemberEntity struct {
-	ID           int    `sql:"id"`
-	BusinessName string `sql:"business_name"`
-	Username     string `sql:"username"`
-	Role         string `sql:"role"`
-	CreatedAt    string `sql:"created_at"`
-	UpdatedAt    string `sql:"updated_at"`
+	ID         int    `sql:"id"`
+	BusinessID string `sql:"business_id"`
+	Username   string `sql:"username"`
+	Role       string `sql:"role"`
+	CreatedAt  string `sql:"created_at"`
+	UpdatedAt  string `sql:"updated_at"`
 }
 
 // BusinessJoiningEntity represents the business joining entity in the database for table tbl_business_joining
 type BusinessJoiningEntity struct {
-	ID           int    `sql:"id"`
-	BusinessName string `sql:"business_name"`
-	Username     string `sql:"username"`
-	Status       string `sql:"status"`
-	ActionedBy   string `sql:"actioned_by"`
-	CreatedAt    string `sql:"created_at"`
-	UpdatedAt    string `sql:"updated_at"`
+	ID         int    `sql:"id"`
+	BusinessID string `sql:"business_id"`
+	Username   string `sql:"username"`
+	Status     string `sql:"status"`
+	ActionedBy string `sql:"actioned_by"`
+	CreatedAt  string `sql:"created_at"`
+	UpdatedAt  string `sql:"updated_at"`
+}
+
+// BusinessCategoryEntity represents the business category entity in the database for table tbl_business_categories
+type BusinessCategoryEntity struct {
+	ID                 int    `sql:"id"`
+	BusinessID         string `sql:"business_id"`
+	CategoryName       string `sql:"category_name"`
+	CategoryPictureURL string `sql:"category_picture_url"`
+	Description        string `sql:"description"`
+	ParentCategoryID   int    `sql:"parent_category_id"`
+	CreatedAt          string `sql:"created_at"`
+	UpdatedAt          string `sql:"updated_at"`
 }

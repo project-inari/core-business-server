@@ -22,7 +22,7 @@ func (m *mockDatabaseRepository) CreateNewBusiness(_ context.Context, _ string, 
 	return m.createNewBusinessRes, m.err
 }
 
-func (m *mockDatabaseRepository) GetBusiness(_ context.Context, _ string) (*dto.BusinessEntity, error) {
+func (m *mockDatabaseRepository) GetBusiness(_ context.Context, _ int) (*dto.BusinessEntity, error) {
 	return m.getBusinessRes, m.err
 }
 
@@ -45,6 +45,7 @@ func (m *mockCacheRepository) UpdateUserCacheNewBusinessJoined(_ context.Context
 }
 
 const (
+	mockBusinessID       = 1
 	mockName             = "mockName"
 	mockIndustryType     = "mockIndustryType"
 	mockBusinessType     = "mockBusinessType"
@@ -226,7 +227,7 @@ func TestBusinessInquiry(t *testing.T) {
 			cacheRepository:    mockCacheRepository,
 		}
 
-		res, err := s.BusinessInquiry(ctx, mockName)
+		res, err := s.BusinessInquiry(ctx, mockBusinessID)
 
 		assert.NoError(t, err)
 		assert.Equal(t, expectedRes, res)
@@ -243,7 +244,7 @@ func TestBusinessInquiry(t *testing.T) {
 			cacheRepository:    mockCacheRepository,
 		}
 
-		res, err := s.BusinessInquiry(ctx, mockName)
+		res, err := s.BusinessInquiry(ctx, mockBusinessID)
 
 		assert.Error(t, err)
 		assert.Nil(t, res)

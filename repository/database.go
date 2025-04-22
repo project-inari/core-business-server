@@ -47,7 +47,12 @@ func (r *databaseRepository) CreateNewBusiness(ctx context.Context, username str
 		return nil, err
 	}
 
-	_, err = tx.ExecContext(ctx, "INSERT INTO tbl_business_members (business_name, username, role) VALUES (?, ?, ?)", entity.Name, username, roleOwner)
+	businessResID, err := businessRes.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = tx.ExecContext(ctx, "INSERT INTO tbl_business_members (business_id, username, role) VALUES (?, ?, ?)", businessResID, username, roleOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -80,8 +85,8 @@ func constructSuccessDBBusinessEntity(res sql.Result, entity dto.BusinessEntity)
 	}
 }
 
-func (r *databaseRepository) GetBusiness(ctx context.Context, businessName string) (*dto.BusinessEntity, error) {
-	row := r.client.QueryRowContext(ctx, "SELECT id, name, industry_type, business_type, description, phone_no, operating_hours, address, business_image_url, created_at, updated_at FROM tbl_businesses WHERE name = ?", businessName)
+func (r *databaseRepository) GetBusiness(ctx context.Context, businessID int) (*dto.BusinessEntity, error) {
+	row := r.client.QueryRowContext(ctx, "SELECT id, name, industry_type, business_type, description, phone_no, operating_hours, address, business_image_url, created_at, updated_at FROM tbl_businesses WHERE id = ?", businessID)
 
 	var entity dto.BusinessEntity
 	if err := row.Scan(&entity.ID, &entity.Name, &entity.IndustryType, &entity.BusinessType, &entity.Description, &entity.PhoneNo, &entity.OperatingHours, &entity.Address, &entity.BusinessImageURL, &entity.CreatedAt, &entity.UpdatedAt); err != nil {
@@ -89,4 +94,23 @@ func (r *databaseRepository) GetBusiness(ctx context.Context, businessName strin
 	}
 
 	return &entity, nil
+}
+
+func (r *databaseRepository) ListBusinessCategories(ctx context.Context, businessID int) ([]dto.BusinessCategoryEntity, error) {
+	rows, err := r.client.QueryContext(ctx, "SELECT id, business_id, category_name, category_picture_url, description, parent_category_id, created_at, updated_at FROM tbl_business_categories WHERE business_id = ?", businessID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var categories []dto.BusinessCategoryEntity
+	for rows.Next() {
+		var category dto.BusinessCategoryEntity
+		if err := rows.Scan(&category.ID, &category.BusinessID, &category.CategoryName, &category.CategoryPictureURL, &category.Description, &category.ParentCategoryID, &category.CreatedAt, &category.UpdatedAt); err != nil {
+			return nil, err
+		}
+		categories = append(categories, category)
+	}
+
+	return categories, nil
 }

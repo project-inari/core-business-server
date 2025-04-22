@@ -8,6 +8,7 @@ import (
 	"github.com/project-inari/core-business-server/dto"
 	"github.com/project-inari/core-business-server/pkg/request"
 	"github.com/project-inari/core-business-server/pkg/response"
+	"github.com/project-inari/core-business-server/pkg/utils"
 )
 
 type httpHandler struct {
@@ -42,12 +43,12 @@ func (h *httpHandler) CreateNewBusiness(c echo.Context) error {
 func (h *httpHandler) BusinessInquiry(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	businessName := c.Param("businessName")
-	if businessName == "" {
+	businessID := c.Param("businessID")
+	if businessID == "" {
 		return response.ErrorResponse(c, http.StatusBadRequest, "error - [BusinessInquiry] bad request: business name is required", "")
 	}
 
-	res, err := h.d.Service.BusinessInquiry(ctx, businessName)
+	res, err := h.d.Service.BusinessInquiry(ctx, utils.ConvertStringToInt(businessID))
 	if err != nil {
 		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [BusinessInquiry] internal server error: %v", err), "")
 	}
