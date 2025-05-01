@@ -16,6 +16,12 @@ type Port interface {
 	ListBusinessCategories(ctx context.Context, businessID int) (*dto.ListBusinessCategoriesRes, error)
 	CreateNewTag(ctx context.Context, req dto.CreateNewTagReq) (*dto.CreateNewTagRes, error)
 	ListBusinessTags(ctx context.Context, businessID int) (*dto.ListBusinessTagsRes, error)
+	CreateNewWarehouse(ctx context.Context, req dto.CreateNewWarehouseReq) (*dto.CreateNewWarehouseRes, error)
+	ListBusinessWarehouses(ctx context.Context, businessID int) (*dto.ListBusinessWarehousesRes, error)
+	CreateNewSupplier(ctx context.Context, req dto.CreateNewSupplierReq) (*dto.CreateNewSupplierRes, error)
+	CreateNewSupplierContact(ctx context.Context, req dto.CreateNewSupplierContactReq) (*dto.CreateNewSupplierContactRes, error)
+	ListBusinessSuppliers(ctx context.Context, businessID int) (*dto.ListBusinessSuppliersRes, error)
+	InquiryBusinessSupplier(ctx context.Context, supplierID int) (*dto.BusinessSupplierModel, error)
 }
 
 type service struct {

@@ -131,6 +131,7 @@ CREATE TABLE `tbl_warehouses` (
   `business_id` int NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` text,
+  `warehouse_picture_url` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

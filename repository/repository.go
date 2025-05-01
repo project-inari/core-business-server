@@ -20,6 +20,13 @@ type DatabaseRepository interface {
 	ListBusinessTags(ctx context.Context, businessID int) ([]dto.BusinessTagEntity, error)
 	AddTagsToCategory(ctx context.Context, tagIds []int, categoryID int) error
 	ListCategoryTags(ctx context.Context, categoryID int) ([]dto.BusinessTagEntity, error)
+	CreateNewWarehouse(ctx context.Context, entity dto.BusinessWarehouseEntity) (int, error)
+	ListBusinessWarehouses(ctx context.Context, businessID int) ([]dto.BusinessWarehouseEntity, error)
+	CreateNewSupplier(ctx context.Context, entity dto.BusinessSupplierEntity) (int, error)
+	CreateNewSupplierContact(ctx context.Context, entity dto.BusinessSupplierContactEntity) (int, error)
+	ListBusinessSuppliers(ctx context.Context, businessID int) ([]dto.BusinessSupplierEntity, error)
+	ListBusinessSupplierContacts(ctx context.Context, supplierID int) ([]dto.BusinessSupplierContactEntity, error)
+	InquiryBusinessSupplier(ctx context.Context, supplierID int) (*dto.BusinessSupplierEntity, error)
 }
 
 // CacheRepository represents the repository layer functions of cache repository

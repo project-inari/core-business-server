@@ -50,6 +50,34 @@ func (m *mockDatabaseRepository) ListCategoryTags(_ context.Context, _ int) ([]d
 	return nil, m.err
 }
 
+func (m *mockDatabaseRepository) CreateNewWarehouse(_ context.Context, _ dto.BusinessWarehouseEntity) (int, error) {
+	return 0, m.err
+}
+
+func (m *mockDatabaseRepository) ListBusinessWarehouses(_ context.Context, _ int) ([]dto.BusinessWarehouseEntity, error) {
+	return nil, m.err
+}
+
+func (m *mockDatabaseRepository) CreateNewSupplier(_ context.Context, _ dto.BusinessSupplierEntity) (int, error) {
+	return 0, m.err
+}
+
+func (m *mockDatabaseRepository) CreateNewSupplierContact(_ context.Context, _ dto.BusinessSupplierContactEntity) (int, error) {
+	return 0, m.err
+}
+
+func (m *mockDatabaseRepository) ListBusinessSuppliers(_ context.Context, _ int) ([]dto.BusinessSupplierEntity, error) {
+	return nil, m.err
+}
+
+func (m *mockDatabaseRepository) ListBusinessSupplierContacts(_ context.Context, _ int) ([]dto.BusinessSupplierContactEntity, error) {
+	return nil, m.err
+}
+
+func (m *mockDatabaseRepository) InquiryBusinessSupplier(_ context.Context, _ int) (*dto.BusinessSupplierEntity, error) {
+	return nil, m.err
+}
+
 type mockCacheRepository struct {
 	getRes *redis.StringCmd
 	setRes *redis.StatusCmd

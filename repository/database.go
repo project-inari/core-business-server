@@ -221,3 +221,145 @@ func (r *databaseRepository) ListCategoryTags(ctx context.Context, categoryID in
 
 	return tags, nil
 }
+
+func (r *databaseRepository) CreateNewWarehouse(ctx context.Context, entity dto.BusinessWarehouseEntity) (int, error) {
+	tx, err := r.client.BeginTx(ctx, nil)
+	if err != nil {
+		return -1, err
+	}
+
+	warehouseRes, err := tx.ExecContext(ctx, "INSERT INTO tbl_warehouses (business_id, name, description, warehouse_picture_url) VALUES (?, ?, ?, ?)", entity.BusinessID, entity.Name, entity.Description, entity.WarehousePictureURL)
+	if err != nil {
+		return -1, err
+	}
+
+	warehouseResID, err := warehouseRes.LastInsertId()
+	if err != nil {
+		return -1, err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return -1, err
+	}
+	return int(warehouseResID), nil
+}
+
+func (r *databaseRepository) ListBusinessWarehouses(ctx context.Context, businessID int) ([]dto.BusinessWarehouseEntity, error) {
+	rows, err := r.client.QueryContext(ctx, "SELECT id, business_id, name, description, warehouse_picture_url, created_at, updated_at FROM tbl_warehouses WHERE business_id = ?", businessID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var warehouses []dto.BusinessWarehouseEntity
+	for rows.Next() {
+		var warehouse dto.BusinessWarehouseEntity
+		if err := rows.Scan(&warehouse.ID, &warehouse.BusinessID, &warehouse.Name, &warehouse.Description, &warehouse.WarehousePictureURL, &warehouse.CreatedAt, &warehouse.UpdatedAt); err != nil {
+			return nil, err
+		}
+		warehouses = append(warehouses, warehouse)
+	}
+
+	return warehouses, nil
+}
+
+func (r *databaseRepository) CreateNewSupplier(ctx context.Context, entity dto.BusinessSupplierEntity) (int, error) {
+	tx, err := r.client.BeginTx(ctx, nil)
+	if err != nil {
+		return -1, err
+	}
+	defer tx.Rollback() // nolint: errcheck
+
+	supplierRes, err := tx.ExecContext(ctx, "INSERT INTO tbl_suppliers (business_id, name, type, description) VALUES (?, ?, ?, ?)", entity.BusinessID, entity.Name, entity.Type, entity.Description)
+	if err != nil {
+		return -1, err
+	}
+
+	supplierResID, err := supplierRes.LastInsertId()
+	if err != nil {
+		return -1, err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return -1, err
+	}
+
+	return int(supplierResID), nil
+}
+
+func (r *databaseRepository) CreateNewSupplierContact(ctx context.Context, entity dto.BusinessSupplierContactEntity) (int, error) {
+	tx, err := r.client.BeginTx(ctx, nil)
+	if err != nil {
+		return -1, err
+	}
+	defer tx.Rollback() // nolint: errcheck
+
+	supplierContactRes, err := tx.ExecContext(ctx, "INSERT INTO tbl_supplier_contacts (supplier_id, full_name, email, phone_no, address, remarks, status) VALUES (?, ?, ?, ?, ?, ?, ?)", entity.SupplierID, entity.FullName, entity.Email, entity.PhoneNo, entity.Address, entity.Remarks, entity.Status)
+	if err != nil {
+		return -1, err
+	}
+
+	supplierContactResID, err := supplierContactRes.LastInsertId()
+	if err != nil {
+		return -1, err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return -1, err
+	}
+
+	return int(supplierContactResID), nil
+}
+
+func (r *databaseRepository) ListBusinessSuppliers(ctx context.Context, businessID int) ([]dto.BusinessSupplierEntity, error) {
+	rows, err := r.client.QueryContext(ctx, "SELECT id, business_id, name, description, created_at, updated_at FROM tbl_suppliers WHERE business_id = ?", businessID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var suppliers []dto.BusinessSupplierEntity
+	for rows.Next() {
+		var supplier dto.BusinessSupplierEntity
+		if err := rows.Scan(&supplier.ID, &supplier.BusinessID, &supplier.Name, &supplier.Description, &supplier.CreatedAt, &supplier.UpdatedAt); err != nil {
+			return nil, err
+		}
+		suppliers = append(suppliers, supplier)
+	}
+
+	return suppliers, nil
+}
+
+func (r *databaseRepository) ListBusinessSupplierContacts(ctx context.Context, supplierID int) ([]dto.BusinessSupplierContactEntity, error) {
+	rows, err := r.client.QueryContext(ctx, "SELECT id, supplier_id, full_name, email, phone_no, address, remarks, status, created_at, updated_at FROM tbl_supplier_contacts WHERE supplier_id = ?", supplierID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var contacts []dto.BusinessSupplierContactEntity
+	for rows.Next() {
+		var contact dto.BusinessSupplierContactEntity
+		if err := rows.Scan(&contact.ID, &contact.SupplierID, &contact.FullName, &contact.Email, &contact.PhoneNo, &contact.Address, &contact.Remarks, &contact.Status, &contact.CreatedAt, &contact.UpdatedAt); err != nil {
+			return nil, err
+		}
+		contacts = append(contacts, contact)
+	}
+
+	return contacts, nil
+}
+
+func (r *databaseRepository) InquiryBusinessSupplier(ctx context.Context, supplierID int) (*dto.BusinessSupplierEntity, error) {
+	row, err := r.client.QueryContext(ctx, "SELECT id, name, type, description, created_at, updated_at FROM tbl_suppliers WHERE supplier_id = ?", supplierID)
+	if err != nil {
+		return nil, err
+	}
+	defer row.Close()
+
+	supplier := new(dto.BusinessSupplierEntity)
+	if err = row.Scan(&supplier.ID, &supplier.Name, &supplier.Description, &supplier.Type, &supplier.CreatedAt, &supplier.UpdatedAt); err != nil {
+		return nil, err
+	}
+
+	return supplier, nil
+}

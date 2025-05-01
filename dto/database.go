@@ -56,3 +56,13 @@ type BusinessTagEntity struct {
 	CreatedAt  string `sql:"created_at"`
 	UpdatedAt  string `sql:"updated_at"`
 }
+
+type BusinessWarehouseEntity struct {
+	ID                  int    `sql:"id"`
+	BusinessID          int    `sql:"business_id"`
+	Name                string `sql:"name"`
+	Description         string `sql:"description"`
+	WarehousePictureURL string `sql:"warehouse_picture_url"`
+	CreatedAt           string `sql:"created_at"`
+	UpdatedAt           string `sql:"updated_at"`
+}

@@ -18,4 +18,14 @@ func (h *httpHandler) initRoutes(e *echo.Echo) {
 	v1Tag := v1.Group("/tag")
 	v1Tag.POST("/create", h.CreateNewTag)
 	v1Tag.GET("/list/:businessID", h.ListBusinessTags)
+
+	v1Warehouse := v1.Group("/warehouse")
+	v1Warehouse.POST("/create", h.CreateNewWarehouse)
+	v1Warehouse.GET("/list/:businessID", h.ListBusinessWarehouses)
+
+	v1Supplier := v1.Group("/supplier")
+	v1Supplier.POST("/create", h.CreateNewSupplier)
+	v1Supplier.POST("/contact/create", h.CreateNewSupplierContact)
+	v1Supplier.GET("/list/:businessID", h.ListBusinessSuppliers)
+	v1Supplier.GET("/contact/inquiry/:supplierID", h.InquiryBusinessSupplier)
 }
