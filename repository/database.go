@@ -519,24 +519,22 @@ func (r *databaseRepository) CreateNewSupplierOrder(ctx context.Context, orderIn
 	}
 	defer tx.Rollback() // nolint: errcheck
 
-	
 	supplierOrderRes, err := tx.ExecContext(ctx, "INSERT INTO tbl_supplier_orders (receive_id, business_id, supplier_id, status, shipping_method, shipping_cost, warehouse_id) VALUES (?, ?, ?, ?, ?, ?, ?)", orderInfo.ReceiveID, orderInfo.BusinessID, orderInfo.SupplierID, orderInfo.Status, orderInfo.ShippingMethod, orderInfo.ShippingCost, orderInfo.WarehouseID)
 	if err != nil {
 		return -1, err
 	}
 
-	
 	supplierOrderResID, err := supplierOrderRes.LastInsertId()
 	if err != nil {
 		return -1, err
 	}
-	
+
 	for _, item := range orderInfo.SupplierOrderItems {
 		itemPrice, err := tx.QueryContext(ctx, "SELECT base_purchase_price FROM tbl_product_variants WHERE id = ?", item.VariantID)
 		if err != nil {
 			return -1, err
 		}
-		
+
 		var basePurchasePrice float64
 		if itemPrice.Next() {
 			if err := itemPrice.Scan(&basePurchasePrice); err != nil {
@@ -544,7 +542,7 @@ func (r *databaseRepository) CreateNewSupplierOrder(ctx context.Context, orderIn
 			}
 		}
 		itemPrice.Close()
-		
+
 		_, err = tx.ExecContext(ctx, "INSERT INTO tbl_supplier_order_products (supplier_order_id, variant_id, quantity, price_per_unit) VALUES (?, ?, ?, ?)", supplierOrderResID, item.VariantID, item.Quantity, basePurchasePrice)
 		if err != nil {
 			return -1, err
@@ -614,7 +612,7 @@ func (r *databaseRepository) ListSupplierOrders(ctx context.Context, businessID 
 }
 
 func (r *databaseRepository) ListBusinessInventory(ctx context.Context, businessID int) ([]dto.BusinessInventoryModel, error) {
-    rows, err := r.client.QueryContext(ctx, `
+	rows, err := r.client.QueryContext(ctx, `
         SELECT 
             v.id,
             v.sku_no,
@@ -629,33 +627,33 @@ func (r *databaseRepository) ListBusinessInventory(ctx context.Context, business
         FROM tbl_products p
         JOIN tbl_product_variants v ON p.id = v.product_id
         WHERE p.business_id = ?`, businessID)
-    if err != nil {
-        return nil, err
-    }
-    defer rows.Close()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-    var result []dto.BusinessInventoryModel
-    for rows.Next() {
-        var inv dto.BusinessInventoryModel
-        if err := rows.Scan(
-            &inv.VariantID,
-            &inv.SKUNo,
-            &inv.ProductName,
-            &inv.VariantName,
-            &inv.PictureURL,
-            &inv.BaseSellingPrice,
-            &inv.BasePurchasePrice,
-            &inv.Note,
-            &inv.SupplierID,
-            &inv.CategoryID,
-        ); err != nil {
-            return nil, err
-        }
+	var result []dto.BusinessInventoryModel
+	for rows.Next() {
+		var inv dto.BusinessInventoryModel
+		if err := rows.Scan(
+			&inv.VariantID,
+			&inv.SKUNo,
+			&inv.ProductName,
+			&inv.VariantName,
+			&inv.PictureURL,
+			&inv.BaseSellingPrice,
+			&inv.BasePurchasePrice,
+			&inv.Note,
+			&inv.SupplierID,
+			&inv.CategoryID,
+		); err != nil {
+			return nil, err
+		}
 
-        // Fetch tags for this variant
-        tagEntities, err := r.ListProductVariantTags(ctx, inv.VariantID)
-        if err == nil {
-            for _, tagEntity := range tagEntities {
+		// Fetch tags for this variant
+		tagEntities, err := r.ListProductVariantTags(ctx, inv.VariantID)
+		if err == nil {
+			for _, tagEntity := range tagEntities {
 				tagInfo, err := r.client.QueryContext(ctx, "SELECT id, tag_name, color FROM tbl_tags WHERE id = ?", tagEntity.TagID)
 				if err != nil {
 					return nil, err
@@ -671,13 +669,13 @@ func (r *databaseRepository) ListBusinessInventory(ctx context.Context, business
 
 				inv.Tags = append(inv.Tags, tag)
 			}
-        }
+		}
 
-        // Fetch warehouse quantities
-        warehouseQty, err := r.ListProductVariantsInWarehouse(ctx, inv.VariantID)
-        if err == nil {
-            inv.QtyInWarehouse = warehouseQty
-        }
+		// Fetch warehouse quantities
+		warehouseQty, err := r.ListProductVariantsInWarehouse(ctx, inv.VariantID)
+		if err == nil {
+			inv.QtyInWarehouse = warehouseQty
+		}
 
 		// Fetch category hierarchy
 		categoryInfo, err := r.buildCategoryHierarchyList(ctx, inv.CategoryID)
@@ -685,68 +683,68 @@ func (r *databaseRepository) ListBusinessInventory(ctx context.Context, business
 			inv.Categories = categoryInfo
 		}
 
-        result = append(result, inv)
-    }
-    if err := rows.Err(); err != nil {
-        return nil, err
-    }
+		result = append(result, inv)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 
-    return result, nil
+	return result, nil
 }
 
 func (r *databaseRepository) buildCategoryHierarchyList(ctx context.Context, categoryID int) ([]dto.InventoryCategoryInfo, error) {
-    var chain []struct {
-        ID          int
-        Name        string
-        ParentCatID sql.NullInt64
-    }
+	var chain []struct {
+		ID          int
+		Name        string
+		ParentCatID sql.NullInt64
+	}
 
-    currID := categoryID
-    for currID > 0 {
-        var record struct {
-            ID          int
-            Name        string
-            ParentCatID sql.NullInt64
-        }
-        err := r.client.QueryRowContext(ctx,
-            "SELECT id, category_name, parent_category_id FROM tbl_categories WHERE id = ?",
-            currID,
-        ).Scan(&record.ID, &record.Name, &record.ParentCatID)
-        if err != nil {
-            return nil, err
-        }
-        chain = append(chain, record)
+	currID := categoryID
+	for currID > 0 {
+		var record struct {
+			ID          int
+			Name        string
+			ParentCatID sql.NullInt64
+		}
+		err := r.client.QueryRowContext(ctx,
+			"SELECT id, category_name, parent_category_id FROM tbl_categories WHERE id = ?",
+			currID,
+		).Scan(&record.ID, &record.Name, &record.ParentCatID)
+		if err != nil {
+			return nil, err
+		}
+		chain = append(chain, record)
 
-        if record.ParentCatID.Valid {
-            currID = int(record.ParentCatID.Int64)
-        } else {
-            break
-        }
-    }
+		if record.ParentCatID.Valid {
+			currID = int(record.ParentCatID.Int64)
+		} else {
+			break
+		}
+	}
 
-    for i, j := 0, len(chain)-1; i < j; i, j = i+1, j-1 {
-        chain[i], chain[j] = chain[j], chain[i]
-    }
+	for i, j := 0, len(chain)-1; i < j; i, j = i+1, j-1 {
+		chain[i], chain[j] = chain[j], chain[i]
+	}
 
-    var categories []dto.InventoryCategoryInfo
-    for i, record := range chain {
-        cat := dto.InventoryCategoryInfo{
-            ID:   record.ID,
-            Name: record.Name,
-        }
-        for j := 0; j < i; j++ {
-            cat.Parent = append(cat.Parent, struct {
-                ID   int    `json:"id"`
-                Name string `json:"name"`
-            }{
-                ID:   chain[j].ID,
-                Name: chain[j].Name,
-            })
-        }
-        categories = append(categories, cat)
-    }
+	var categories []dto.InventoryCategoryInfo
+	for i, record := range chain {
+		cat := dto.InventoryCategoryInfo{
+			ID:   record.ID,
+			Name: record.Name,
+		}
+		for j := 0; j < i; j++ {
+			cat.Parent = append(cat.Parent, struct {
+				ID   int    `json:"id"`
+				Name string `json:"name"`
+			}{
+				ID:   chain[j].ID,
+				Name: chain[j].Name,
+			})
+		}
+		categories = append(categories, cat)
+	}
 
-    return categories, nil
+	return categories, nil
 }
 
 func (r *databaseRepository) InquiryProductInventory(ctx context.Context, variantID int) (*dto.BusinessInventoryModel, error) {
@@ -812,4 +810,115 @@ func (r *databaseRepository) InquiryProductInventory(ctx context.Context, varian
 	}
 
 	return &inv, nil
+}
+
+func (r *databaseRepository) CreateNewCustomer(ctx context.Context, entity dto.BusinessCustomerEntity) (int, error) {
+	tx, err := r.client.BeginTx(ctx, nil)
+	if err != nil {
+		return -1, err
+	}
+	defer tx.Rollback() // nolint: errcheck
+
+	customerRes, err := tx.ExecContext(ctx, "INSERT INTO tbl_customers (business_id, name, type, phone_no, address) VALUES (?, ?, ?, ?, ?)", entity.BusinessID, entity.Name, entity.Type, entity.PhoneNo, entity.Address)
+	if err != nil {
+		return -1, err
+	}
+
+	customerResID, err := customerRes.LastInsertId()
+	if err != nil {
+		return -1, err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return -1, err
+	}
+
+	return int(customerResID), nil
+}
+
+func (r *databaseRepository) ListBusinessCustomers(ctx context.Context, businessID int) ([]dto.BusinessCustomerEntity, error) {
+	rows, err := r.client.QueryContext(ctx, "SELECT id, business_id, name, type, phone_no, address, created_at, updated_at FROM tbl_customers WHERE business_id = ?", businessID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var customers []dto.BusinessCustomerEntity
+	for rows.Next() {
+		var customer dto.BusinessCustomerEntity
+		if err := rows.Scan(&customer.ID, &customer.BusinessID, &customer.Name, &customer.Type, &customer.PhoneNo, &customer.Address, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
+			return nil, err
+		}
+		customers = append(customers, customer)
+	}
+
+	return customers, nil
+}
+
+func (r *databaseRepository) CreateNewCustomerOrder(ctx context.Context, orderInfo dto.CreateNewCustomerOrderReq) (int, error) {
+	tx, err := r.client.BeginTx(ctx, nil)
+	if err != nil {
+		return -1, err
+	}
+	defer tx.Rollback() // nolint: errcheck
+
+	customerOrderRes, err := tx.ExecContext(ctx, "INSERT INTO tbl_customer_orders (order_id, business_id, customer_id, channel_id, status_id, shipping_method, shipping_fee, shipping_cost) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", orderInfo.OrderID, orderInfo.BusinessID, orderInfo.CustomerID, orderInfo.ChannelID, orderInfo.StatusID, orderInfo.ShippingMethod, orderInfo.ShippingFee, orderInfo.ShippingCost)
+	if err != nil {
+		return -1, err
+	}
+
+	customerOrderResID, err := customerOrderRes.LastInsertId()
+	if err != nil {
+		return -1, err
+	}
+
+	for _, item := range orderInfo.CustomerOrderItems {
+		_, err = tx.ExecContext(ctx, "INSERT INTO tbl_customer_order_products (customer_order_id, variant_id, quantity, selling_price_per_unit, discount) VALUES (?, ?, ?, ?, ?)", customerOrderResID, item.VariantID, item.Quantity, item.PricePerUnit, item.DiscountPerUnit)
+		if err != nil {
+			return -1, err
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return -1, err
+	}
+
+	return int(customerOrderResID), nil
+}
+
+func (r *databaseRepository) ListCustomerOrders(ctx context.Context, businessID int) ([]dto.CustomerOrderModel, error) {
+	rows, err := r.client.QueryContext(ctx, "SELECT id, order_id, customer_id, channel_id, status_id, shipping_method, shipping_fee, shipping_cost, created_at, updated_at FROM tbl_customer_orders WHERE business_id = ?", businessID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var orders []dto.CustomerOrderModel
+	for rows.Next() {
+		var order dto.CustomerOrderModel
+		if err := rows.Scan(&order.ID, &order.OrderID, &order.CustomerID, &order.ChannelID, &order.StatusID, &order.ShippingMethod, &order.ShippingFee, &order.ShippingCost, &order.CreatedAt, &order.UpdatedAt); err != nil {
+			return nil, err
+		}
+		orders = append(orders, order)
+	}
+
+	for i := range orders {
+		items, err := r.client.QueryContext(ctx, "SELECT variant_id, quantity, selling_price_per_unit, discount FROM tbl_customer_order_products WHERE customer_order_id = ?", orders[i].ID)
+		if err != nil {
+			return nil, err
+		}
+		defer items.Close()
+
+		var orderItems []dto.CustomerOrderItem
+		for items.Next() {
+			var item dto.CustomerOrderItem
+			if err := items.Scan(&item.VariantID, &item.Quantity, &item.PricePerUnit, &item.DiscountPerUnit); err != nil {
+				return nil, err
+			}
+			orderItems = append(orderItems, item)
+		}
+		orders[i].Items = orderItems
+	}
+
+	return orders, nil
 }

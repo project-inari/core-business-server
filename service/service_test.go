@@ -122,6 +122,22 @@ func (m *mockDatabaseRepository) InquiryProductInventory(_ context.Context, _ in
 	return nil, m.err
 }
 
+func (m *mockDatabaseRepository) CreateNewCustomer(_ context.Context, _ dto.BusinessCustomerEntity) (int, error) {
+	return 0, m.err
+}
+
+func (m *mockDatabaseRepository) ListBusinessCustomers(_ context.Context, _ int) ([]dto.BusinessCustomerEntity, error) {
+	return nil, m.err
+}
+
+func (m *mockDatabaseRepository) CreateNewCustomerOrder(_ context.Context, _ dto.CreateNewCustomerOrderReq) (int, error) {
+	return 0, m.err
+}
+
+func (m *mockDatabaseRepository) ListCustomerOrders(_ context.Context, _ int) ([]dto.CustomerOrderModel, error) {
+	return nil, m.err
+}
+
 type mockCacheRepository struct {
 	getRes *redis.StringCmd
 	setRes *redis.StatusCmd

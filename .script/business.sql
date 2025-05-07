@@ -26,6 +26,15 @@ CREATE TABLE `tbl_channels` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
+-- business.tbl_statuses definition
+
+CREATE TABLE `tbl_statuses` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 -- business.tbl_business_joinings definition
 
 CREATE TABLE `tbl_business_joinings` (
@@ -160,6 +169,7 @@ CREATE TABLE `tbl_customer_orders` (
   `business_id` int NOT NULL,
   `customer_id` int NOT NULL,
   `channel_id` int NOT NULL,
+  `status_id` int NOT NULL,
   `shipping_method` varchar(100) DEFAULT NULL,
   `shipping_fee` decimal(10,2) DEFAULT NULL,
   `shipping_cost` decimal(10,2) DEFAULT NULL,
@@ -171,7 +181,8 @@ CREATE TABLE `tbl_customer_orders` (
   KEY `channel_id` (`channel_id`),
   CONSTRAINT `tbl_customer_orders_ibfk_1` FOREIGN KEY (`business_id`) REFERENCES `tbl_businesses` (`id`) ON DELETE CASCADE,
   CONSTRAINT `tbl_customer_orders_ibfk_2` FOREIGN KEY (`customer_id`) REFERENCES `tbl_customers` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `tbl_customer_orders_ibfk_3` FOREIGN KEY (`channel_id`) REFERENCES `tbl_channels` (`id`) ON DELETE CASCADE
+  CONSTRAINT `tbl_customer_orders_ibfk_3` FOREIGN KEY (`channel_id`) REFERENCES `tbl_channels` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tbl_customer_orders_ibfk_4` FOREIGN KEY (`status_id`) REFERENCES `tbl_statuses` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -345,3 +356,15 @@ CREATE TABLE `tbl_supplier_order_products` (
   CONSTRAINT `tbl_supplier_order_products_ibfk_1` FOREIGN KEY (`supplier_order_id`) REFERENCES `tbl_supplier_orders` (`id`) ON DELETE CASCADE,
   CONSTRAINT `tbl_supplier_order_products_ibfk_2` FOREIGN KEY (`variant_id`) REFERENCES `tbl_product_variants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `business`.`tbl_channels` (`id`, `name`) VALUES ('1', 'Retail');
+INSERT INTO `business`.`tbl_channels` (`id`, `name`) VALUES ('2', 'Facebook');
+INSERT INTO `business`.`tbl_channels` (`id`, `name`) VALUES ('3', 'LINE');
+INSERT INTO `business`.`tbl_channels` (`id`, `name`) VALUES ('4', 'Shopee');
+INSERT INTO `business`.`tbl_channels` (`id`, `name`) VALUES ('5', 'Lazada');
+
+INSERT INTO `business`.`tbl_statuses` (`id`, `name`) VALUES ('1', 'Pending Payment');
+INSERT INTO `business`.`tbl_statuses` (`id`, `name`) VALUES ('2', 'Order Confirmed');
+INSERT INTO `business`.`tbl_statuses` (`id`, `name`) VALUES ('3', 'Awaiting Shipment');
+INSERT INTO `business`.`tbl_statuses` (`id`, `name`) VALUES ('4', 'Shipped / In Transit');
+INSERT INTO `business`.`tbl_statuses` (`id`, `name`) VALUES ('5', 'Completed');

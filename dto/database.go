@@ -147,3 +147,38 @@ type BusinessSupplierOrderProductEntity struct {
 	Quantity        int     `sql:"quantity"`
 	PricePerUnit    float64 `sql:"price_per_unit"`
 }
+
+type BusinessCustomerEntity struct {
+	ID         int    `sql:"id"`
+	BusinessID int    `sql:"business_id"`
+	Name       string `sql:"name"`
+	Type       string `sql:"type"`
+	Address    string `sql:"address"`
+	PhoneNo    string `sql:"phone_no"`
+	CreatedAt  string `sql:"created_at"`
+	UpdatedAt  string `sql:"updated_at"`
+}
+
+type BusinessCustomerOrderEntity struct {
+	ID             int     `sql:"id"`
+	OrderID        string  `sql:"order_id"`
+	BusinessID     int     `sql:"business_id"`
+	CustomerID     int     `sql:"customer_id"`
+	ChannelID      int     `sql:"channel_id"`
+	StatusID       int     `sql:"status_id"`
+	ShippingMethod string  `sql:"shipping_method"`
+	ShippingFee    float64 `sql:"shipping_fee"`
+	ShippingCost   float64 `sql:"shipping_cost"`
+	CreatedAt      string  `sql:"created_at"`
+	UpdatedAt      string  `sql:"updated_at"`
+}
+
+type BusinessCustomerOrderItemEntity struct {
+	CustomerOrderID     int     `sql:"customer_order_id"`
+	VariantID           int     `sql:"variant_id"`
+	Quantity            int     `sql:"quantity"`
+	SellingPricePerUnit float64 `sql:"selling_price_per_unit"`
+	Discount            float64 `sql:"discount"`
+	CreatedAt           string  `sql:"created_at"`
+	UpdatedAt           string  `sql:"updated_at"`
+}

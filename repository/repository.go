@@ -38,6 +38,10 @@ type DatabaseRepository interface {
 	ListSupplierOrders(ctx context.Context, businessID int) ([]dto.SupplierOrderModel, error)
 	ListBusinessInventory(ctx context.Context, businessID int) ([]dto.BusinessInventoryModel, error)
 	InquiryProductInventory(ctx context.Context, variantID int) (*dto.BusinessInventoryModel, error)
+	CreateNewCustomer(ctx context.Context, entity dto.BusinessCustomerEntity) (int, error)
+	ListBusinessCustomers(ctx context.Context, businessID int) ([]dto.BusinessCustomerEntity, error)
+	CreateNewCustomerOrder(ctx context.Context, orderInfo dto.CreateNewCustomerOrderReq) (int, error)
+	ListCustomerOrders(ctx context.Context, businessID int) ([]dto.CustomerOrderModel, error)
 }
 
 // CacheRepository represents the repository layer functions of cache repository

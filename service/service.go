@@ -29,6 +29,10 @@ type Port interface {
 	ListSupplierOrders(ctx context.Context, businessID int) (*dto.ListSupplierOrdersRes, error)
 	ListBusinessInventory(ctx context.Context, businessID int) (*dto.ListBusinessInventoryRes, error)
 	InquiryProductInventory(ctx context.Context, variantID int) (*dto.BusinessInventoryModel, error)
+	CreateNewCustomer(ctx context.Context, req dto.CreateNewCustomerReq) (*dto.CreateNewCustomerRes, error)
+	ListBusinessCustomers(ctx context.Context, businessID int) (*dto.ListBusinessCustomersRes, error)
+	CreateNewCustomerOrder(ctx context.Context, req dto.CreateNewCustomerOrderReq) (*dto.CreateNewCustomerOrderRes, error)
+	ListCustomerOrders(ctx context.Context, businessID int) (*dto.ListCustomerOrdersRes, error)
 }
 
 type service struct {

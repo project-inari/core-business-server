@@ -39,4 +39,12 @@ func (h *httpHandler) initRoutes(e *echo.Echo) {
 	v1Inventory := v1.Group("/inventory")
 	v1Inventory.GET("/list/:businessID", h.ListBusinessInventory)
 	v1Inventory.GET("/inquiry/:variantID", h.InquiryProductInventory)
+
+	v1Customer := v1.Group("/customer")
+	v1Customer.POST("/create", h.CreateNewCustomer)
+	v1Customer.GET("/list/:businessID", h.ListBusinessCustomers)
+
+	v1CustomerOrder := v1.Group("/order")
+	v1CustomerOrder.POST("/create", h.CreateNewCustomerOrder)
+	v1CustomerOrder.GET("/list/:businessID", h.ListCustomerOrders)
 }

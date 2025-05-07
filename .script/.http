@@ -187,3 +187,52 @@ Content-Type: application/json
 
 GET http://localhost:8080/v1/inventory/inquiry/1
 Content-Type: application/json
+
+POST http://localhost:8080/v1/customer/create
+Content-Type: application/json
+{
+    "businessId": 1,
+    "name": "testcus1",
+    "type": "individual",
+    "address": "123/456",
+    "phoneNo": "+66999999990"
+}
+
+GET http://localhost:8080/v1/customer/list/1
+Content-Type: application/json
+
+POST http://localhost:8080/v1/order/create
+Content-Type: application/json
+{
+    "businessId": 1,
+    "orderId": "ORDER-1",
+    "customerId": 1,
+    "channelId": 1,
+    "statusId": 2,
+    "shippingMethod": "Kerry",
+    "shippingFee": 100,
+    "shippingCost": 80,
+    "customerOrderItems": [
+        {
+            "variantId": 1,
+            "quantity": 10,
+            "pricePerUnit": 100,
+            "discountPerUnit": 0
+        },
+        {
+            "variantId": 2,
+            "quantity": 20,
+            "pricePerUnit": 200,
+            "discountPerUnit": 20
+        },
+        {
+            "variantId": 3,
+            "quantity": 30,
+            "pricePerUnit": 300,
+            "discountPerUnit": 30
+        }
+    ]
+}
+
+GET http://localhost:8080/v1/order/list/1
+Content-Type: application/json
