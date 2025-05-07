@@ -47,6 +47,16 @@ Content-Type: application/json
 GET http://localhost:8080/v1/inquiry/1
 Content-Type: application/json
 
+POST http://localhost:8080/v1/tag/create
+Content-Type: application/json
+{
+    "businessId": 1,
+    "tagName": "testtag2",
+    "color": "red"
+}
+
+GET http://localhost:8080/v1/tag/list/1
+
 POST http://localhost:8080/v1/category/create
 Content-Type: application/json
 {
@@ -61,12 +71,84 @@ Content-Type: application/json
 GET http://localhost:8080/v1/category/list/1
 Content-Type: application/json
 
-POST http://localhost:8080/v1/tag/create
+POST http://localhost:8080/v1/warehouse/create
 Content-Type: application/json
 {
     "businessId": 1,
-    "tagName": "testtag2",
-    "color": "red"
+    "warehouseName": "testwh1",
+    "description": "This is a test warehouse",
+    "warehousePictureUrl": "https://www.google.com"
 }
 
-GET http://localhost:8080/v1/tag/list/1
+GET http://localhost:8080/v1/warehouse/list/1
+Content-Type: application/json
+
+POST http://localhost:8080/v1/supplier/create
+Content-Type: application/json
+{
+    "businessId": 1,
+    "supplierName": "testsup1",
+    "description": "This is a test supplier",
+    "type": "testtype1"
+}
+
+POST http://localhost:8080/v1/supplier/contact/create
+Content-Type: application/json
+{
+    "businessId": 1,
+    "supplierId": 1,
+    "fullName": "testsupcontact1",
+    "email": "testsupcontact1@email.com",
+    "phoneNo": "+66999999990",
+    "address": "123/456",
+    "remarks": "This is a test supplier contact",
+    "status": "active"
+}
+
+GET http://localhost:8080/v1/supplier/list/1
+Content-Type: application/json
+
+GET http://localhost:8080/v1/supplier/contact/inquiry/1
+Content-Type: application/json
+
+POST http://localhost:8080/v1/product/create
+Content-Type: application/json
+{
+    "businessId": 1,
+    "supplierId": 1,
+    "name": "testprod1",
+    "brand": "testbrand1",
+    "categoryId": 1,
+    "variants": [
+        {
+            "variantName": "testvar1",
+            "skuNo": "1",
+            "pictureUrl": "https://www.google.com",
+            "baseSellingPrice": 100,
+            "basePurchasePrice": 50,
+            "note": "This is a test variant 1"
+        },
+        {
+            "variantName": "testvar2",
+            "skuNo": "2",
+            "pictureUrl": "https://www.google.com",
+            "baseSellingPrice": 200,
+            "basePurchasePrice": 100,
+            "note": "This is a test variant 2"
+        },
+        {
+            "variantName": "testvar3",
+            "skuNo": "3",
+            "pictureUrl": "https://www.google.com",
+            "baseSellingPrice": 300,
+            "basePurchasePrice": 150,
+            "note": "This is a test variant 3"
+        }
+    ]
+}
+
+GET http://localhost:8080/v1/product/list/1
+Content-Type: application/json
+
+GET http://localhost:8080/v1/product/inquiry/1
+Content-Type: application/json

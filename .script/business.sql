@@ -199,20 +199,17 @@ CREATE TABLE `tbl_products` (
 CREATE TABLE `tbl_product_variants` (
   `id` int NOT NULL AUTO_INCREMENT,
   `product_id` int NOT NULL,
-  `business_id` int NOT NULL,
   `variant_name` varchar(255) DEFAULT NULL,
   `sku_no` varchar(50) DEFAULT NULL,
   `picture_url` text DEFAULT NULL,
   `base_selling_price` decimal(10,2) DEFAULT NULL,
-  `base_purchase_price` decimal(10,2) pDEFAULT NULL,
+  `base_purchase_price` decimal(10,2) DEFAULT NULL,
   `note` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_sku_per_business` (`business_id`, `sku_no`),
   KEY `product_id` (`product_id`),
-  CONSTRAINT `tbl_product_variants_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `tbl_products` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `tbl_product_variants_ibfk_2` FOREIGN KEY (`business_id`) REFERENCES `tbl_businesses` (`id`) ON DELETE CASCADE
+  CONSTRAINT `tbl_product_variants_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `tbl_products` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- business.tbl_stock_movements definition
@@ -233,9 +230,9 @@ CREATE TABLE `tbl_stock_movements` (
   CONSTRAINT `tbl_stock_movements_ibfk_2` FOREIGN KEY (`to_warehouse_id`) REFERENCES `tbl_warehouses` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- business.tbl_supplier_contact definition
+-- business.tbl_supplier_contacts definition
 
-CREATE TABLE `tbl_supplier_contact` (
+CREATE TABLE `tbl_supplier_contacts` (
   `id` int NOT NULL AUTO_INCREMENT,
   `supplier_id` int NOT NULL,
   `full_name` varchar(100) NOT NULL,
@@ -322,27 +319,15 @@ CREATE TABLE `tbl_product_stock_movement` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
--- business.tbl_product_tags definition
+-- business.tbl_variant_tags definition
 
-CREATE TABLE `tbl_product_tags` (
-  `product_id` int NOT NULL,
+CREATE TABLE `tbl_variant_tags` (
+  `variant_id` int NOT NULL,
   `tag_id` int NOT NULL,
-  PRIMARY KEY (`product_id`,`tag_id`),
+  PRIMARY KEY (`variant_id`,`tag_id`),
   KEY `tag_id` (`tag_id`),
-  CONSTRAINT `tbl_product_tags_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `tbl_products` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `tbl_product_tags_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `tbl_tags` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
--- business.tbl_category_tags definition
-
-CREATE TABLE `tbl_category_tags` (
-  `category_id` int NOT NULL,
-  `tag_id` int NOT NULL,
-  PRIMARY KEY (`category_id`,`tag_id`),
-  KEY `tag_id` (`tag_id`),
-  CONSTRAINT `tbl_category_tags_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `tbl_categories` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `tbl_category_tags_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `tbl_tags` (`id`) ON DELETE CASCADE
+  CONSTRAINT `tbl_variant_tags_ibfk_1` FOREIGN KEY (`variant_id`) REFERENCES `tbl_product_variants` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tbl_variant_tags_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `tbl_tags` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 

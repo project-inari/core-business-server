@@ -350,16 +350,164 @@ func (r *databaseRepository) ListBusinessSupplierContacts(ctx context.Context, s
 }
 
 func (r *databaseRepository) InquiryBusinessSupplier(ctx context.Context, supplierID int) (*dto.BusinessSupplierEntity, error) {
-	row, err := r.client.QueryContext(ctx, "SELECT id, name, type, description, created_at, updated_at FROM tbl_suppliers WHERE supplier_id = ?", supplierID)
+	rows, err := r.client.QueryContext(ctx, "SELECT id, name, type, description, created_at, updated_at FROM tbl_suppliers WHERE id = ?", supplierID)
 	if err != nil {
 		return nil, err
 	}
-	defer row.Close()
+	defer rows.Close()
+
+	if !rows.Next() {
+		return nil, sql.ErrNoRows
+	}
 
 	supplier := new(dto.BusinessSupplierEntity)
-	if err = row.Scan(&supplier.ID, &supplier.Name, &supplier.Description, &supplier.Type, &supplier.CreatedAt, &supplier.UpdatedAt); err != nil {
+	if err = rows.Scan(&supplier.ID, &supplier.Name, &supplier.Type, &supplier.Description, &supplier.CreatedAt, &supplier.UpdatedAt); err != nil {
 		return nil, err
 	}
 
 	return supplier, nil
+}
+
+func (r *databaseRepository) CreateNewProduct(ctx context.Context, product dto.BusinessProductEntity, variants []dto.BusinessProductVariantEntity) (int, error) {
+	tx, err := r.client.BeginTx(ctx, nil)
+	if err != nil {
+		return -1, err
+	}
+	defer tx.Rollback() // nolint: errcheck
+
+	productRes, err := tx.ExecContext(ctx, "INSERT INTO tbl_products (business_id, supplier_id, item_name, brand, category_id) VALUES (?, ?, ?, ?, ?)", product.BusinessID, product.SupplierID, product.ItemName, product.Brand, product.CategoryID)
+	if err != nil {
+		return -1, err
+	}
+
+	productResID, err := productRes.LastInsertId()
+	if err != nil {
+		return -1, err
+	}
+
+	categoryTags, err := r.ListCategoryTags(ctx, product.CategoryID)
+	if err != nil {
+		return -1, err
+	}
+
+	for _, variant := range variants {
+		_, err := tx.ExecContext(ctx, "INSERT INTO tbl_product_variants (product_id, variant_name, sku_no, picture_url, base_selling_price, base_purchase_price, note) VALUES (?, ?, ?, ?, ?, ?, ?)", productResID, variant.VariantName, variant.SKUNo, variant.PictureURL, variant.BaseSellingPrice, variant.BasePurchasePrice, variant.Note)
+		if err != nil {
+			return -1, err
+		}
+
+		for _, tag := range categoryTags {
+			_, err := tx.ExecContext(ctx, "INSERT INTO tbl_variant_tags (variant_id, tag_id) VALUES (?, ?)", variant.ID, tag.ID)
+			if err != nil {
+				return -1, err
+			}
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return -1, err
+	}
+
+	return int(productResID), nil
+}
+
+func (r *databaseRepository) ListBusinessProducts(ctx context.Context, businessID int) ([]dto.BusinessProductEntity, error) {
+	rows, err := r.client.QueryContext(ctx, "SELECT id, business_id, supplier_id, item_name, brand, category_id, created_at, updated_at FROM tbl_products WHERE business_id = ?", businessID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var products []dto.BusinessProductEntity
+	for rows.Next() {
+		var product dto.BusinessProductEntity
+		if err := rows.Scan(&product.ID, &product.BusinessID, &product.SupplierID, &product.ItemName, &product.Brand, &product.CategoryID, &product.CreatedAt, &product.UpdatedAt); err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
+
+	return products, nil
+}
+
+func (r *databaseRepository) ListBusinessProductVariants(ctx context.Context, productID int) ([]dto.BusinessProductVariantEntity, error) {
+	rows, err := r.client.QueryContext(ctx, "SELECT id, product_id, variant_name, sku_no, picture_url, base_selling_price, base_purchase_price, note, created_at, updated_at FROM tbl_product_variants WHERE product_id = ?", productID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var variants []dto.BusinessProductVariantEntity
+	for rows.Next() {
+		var variant dto.BusinessProductVariantEntity
+		if err := rows.Scan(&variant.ID, &variant.ProductID, &variant.VariantName, &variant.SKUNo, &variant.PictureURL, &variant.BaseSellingPrice, &variant.BasePurchasePrice, &variant.Note, &variant.CreatedAt, &variant.UpdatedAt); err != nil {
+			return nil, err
+		}
+		variants = append(variants, variant)
+	}
+
+	return variants, nil
+}
+
+func (r *databaseRepository) InquiryBusinessProduct(ctx context.Context, productID int) (*dto.BusinessProductEntity, error) {
+	row := r.client.QueryRowContext(ctx, "SELECT id, business_id, supplier_id, item_name, brand, category_id, created_at, updated_at FROM tbl_products WHERE id = ?", productID)
+
+	var entity dto.BusinessProductEntity
+	if err := row.Scan(&entity.ID, &entity.BusinessID, &entity.SupplierID, &entity.ItemName, &entity.Brand, &entity.CategoryID, &entity.CreatedAt, &entity.UpdatedAt); err != nil {
+		return nil, err
+	}
+
+	return &entity, nil
+}
+
+func (r *databaseRepository) InquiryBusinessProductVariant(ctx context.Context, variantID int) (*dto.BusinessProductVariantEntity, error) {
+	row := r.client.QueryRowContext(ctx, "SELECT id, product_id, variant_name, sku_no, picture_url, base_selling_price, base_purchase_price, note, created_at, updated_at FROM tbl_product_variants WHERE id = ?", variantID)
+
+	var entity dto.BusinessProductVariantEntity
+	if err := row.Scan(&entity.ID, &entity.ProductID, &entity.VariantName, &entity.SKUNo, &entity.PictureURL, &entity.BaseSellingPrice, &entity.BasePurchasePrice, &entity.Note, &entity.CreatedAt, &entity.UpdatedAt); err != nil {
+		return nil, err
+	}
+
+	return &entity, nil
+}
+
+func (r *databaseRepository) ListProductVariantsInWarehouse(ctx context.Context, variantID int) ([]dto.WarehouseQty, error) {
+	rows, err := r.client.QueryContext(ctx, "SELECT warehouse_id, quantity FROM tbl_inventory WHERE variant_id = ?", variantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var warehouseQty []dto.WarehouseQty
+	for rows.Next() {
+		var qty dto.WarehouseQty
+		if err := rows.Scan(&qty.WarehouseID, &qty.Qty); err != nil {
+			return nil, err
+		}
+		warehouseQty = append(warehouseQty, qty)
+	}
+
+	return warehouseQty, nil
+}
+
+func (r *databaseRepository) ListProductVariantTags(ctx context.Context, variantID int) ([]dto.BusinessProductVariantTagEntity, error) {
+	rows, err := r.client.QueryContext(ctx, "SELECT tag_id FROM tbl_variant_tags WHERE variant_id = ?", variantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tags []dto.BusinessProductVariantTagEntity
+	for rows.Next() {
+		var tag dto.BusinessProductVariantTagEntity
+		if err := rows.Scan(&tag.TagID); err != nil {
+			return nil, err
+		}
+		tags = append(tags, tag)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return tags, nil
 }

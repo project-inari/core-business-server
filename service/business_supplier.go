@@ -27,7 +27,7 @@ func (s *service) CreateNewSupplier(ctx context.Context, req dto.CreateNewSuppli
 
 func (s *service) CreateNewSupplierContact(ctx context.Context, req dto.CreateNewSupplierContactReq) (*dto.CreateNewSupplierContactRes, error) {
 	supplierContactEntity := dto.BusinessSupplierContactEntity{
-		SupplierID: &req.SupplierID,
+		SupplierID: req.SupplierID,
 		FullName:   req.FullName,
 		Email:      req.Email,
 		PhoneNo:    req.PhoneNo,

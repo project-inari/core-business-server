@@ -22,6 +22,9 @@ type Port interface {
 	CreateNewSupplierContact(ctx context.Context, req dto.CreateNewSupplierContactReq) (*dto.CreateNewSupplierContactRes, error)
 	ListBusinessSuppliers(ctx context.Context, businessID int) (*dto.ListBusinessSuppliersRes, error)
 	InquiryBusinessSupplier(ctx context.Context, supplierID int) (*dto.BusinessSupplierModel, error)
+	CreateNewProduct(ctx context.Context, req dto.CreateNewProductReq) (*dto.CreateNewProductRes, error)
+	ListBusinessProducts(ctx context.Context, businessID int) (*dto.ListBusinessProductsRes, error)
+	InquiryBusinessProduct(ctx context.Context, productID int) (*dto.BusinessProductModel, error)
 }
 
 type service struct {

@@ -78,6 +78,34 @@ func (m *mockDatabaseRepository) InquiryBusinessSupplier(_ context.Context, _ in
 	return nil, m.err
 }
 
+func (m *mockDatabaseRepository) CreateNewProduct(_ context.Context, _ dto.BusinessProductEntity, _ []dto.BusinessProductVariantEntity) (int, error) {
+	return 0, m.err
+}
+
+func (m *mockDatabaseRepository) ListBusinessProducts(_ context.Context, _ int) ([]dto.BusinessProductEntity, error) {
+	return nil, m.err
+}
+
+func (m *mockDatabaseRepository) ListBusinessProductVariants(_ context.Context, _ int) ([]dto.BusinessProductVariantEntity, error) {
+	return nil, m.err
+}
+
+func (m *mockDatabaseRepository) InquiryBusinessProduct(_ context.Context, _ int) (*dto.BusinessProductEntity, error) {
+	return nil, m.err
+}
+
+func (m *mockDatabaseRepository) InquiryBusinessProductVariant(_ context.Context, _ int) (*dto.BusinessProductVariantEntity, error) {
+	return nil, m.err
+}
+
+func (m *mockDatabaseRepository) ListProductVariantsInWarehouse(_ context.Context, _ int) ([]dto.WarehouseQty, error) {
+	return nil, m.err
+}
+
+func (m *mockDatabaseRepository) ListProductVariantTags(_ context.Context, _ int) ([]dto.BusinessProductVariantTagEntity, error) {
+	return nil, m.err
+}
+
 type mockCacheRepository struct {
 	getRes *redis.StringCmd
 	setRes *redis.StatusCmd

@@ -220,3 +220,52 @@ func (h *httpHandler) InquiryBusinessSupplier(c echo.Context) error {
 
 	return response.SuccessResponse(c, http.StatusOK, res)
 }
+
+func (h *httpHandler) CreateNewProduct(c echo.Context) error {
+	ctx := c.Request().Context()
+	wrapper := request.ContextWrapper(c)
+
+	req := new(dto.CreateNewProductReq)
+	if err := wrapper.Bind(req); err != nil {
+		return response.ErrorResponse(c, http.StatusBadRequest, fmt.Sprintf("error - [CreateNewProduct] bad request: %v", err), "")
+	}
+
+	res, err := h.d.Service.CreateNewProduct(ctx, *req)
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [CreateNewProduct] internal server error: %v", err), "")
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}
+
+func (h *httpHandler) ListBusinessProducts(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	businessID := c.Param("businessID")
+	if businessID == "" {
+		return response.ErrorResponse(c, http.StatusBadRequest, "error - [ListBusinessProducts] bad request: business name is required", "")
+	}
+
+	res, err := h.d.Service.ListBusinessProducts(ctx, utils.ConvertStringToInt(businessID))
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [ListBusinessProducts] internal server error: %v", err), "")
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}
+
+func (h *httpHandler) InquiryBusinessProduct(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	productID := c.Param("productID")
+	if productID == "" {
+		return response.ErrorResponse(c, http.StatusBadRequest, "error - [InquiryBusinessProduct] bad request: product ID is required", "")
+	}
+
+	res, err := h.d.Service.InquiryBusinessProduct(ctx, utils.ConvertStringToInt(productID))
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [InquiryBusinessProduct] internal server error: %v", err), "")
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}

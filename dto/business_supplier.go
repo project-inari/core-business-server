@@ -27,16 +27,6 @@ type BusinessSupplierModel struct {
 	UpdatedAt        string                          `json:"updatedAt"`
 }
 
-type BusinessSupplierEntity struct {
-	ID          int    `sql:"id"`
-	BusinessID  int    `sql:"business_id"`
-	Name        string `sql:"name"`
-	Type        string `sql:"type"`
-	Description string `sql:"description"`
-	CreatedAt   string `sql:"created_at"`
-	UpdatedAt   string `sql:"updated_at"`
-}
-
 type CreateNewSupplierContactReq struct {
 	BusinessID int    `json:"businessId" validate:"required"`
 	SupplierID int    `json:"supplierId" validate:"required"`
@@ -55,7 +45,7 @@ type CreateNewSupplierContactRes struct {
 
 type BusinessSupplierContactModel struct {
 	ID         int    `json:"id"`
-	SupplierID *int   `json:"supplierId,omitempty"`
+	SupplierID int    `json:"supplierId"`
 	FullName   string `json:"fullName"`
 	Email      string `json:"email"`
 	PhoneNo    string `json:"phoneNo"`
@@ -64,17 +54,4 @@ type BusinessSupplierContactModel struct {
 	Status     string `json:"status"`
 	CreatedAt  string `json:"createdAt"`
 	UpdatedAt  string `json:"updatedAt"`
-}
-
-type BusinessSupplierContactEntity struct {
-	ID         int    `sql:"id"`
-	SupplierID *int   `sql:"supplier_id"`
-	FullName   string `sql:"full_name"`
-	Email      string `sql:"email"`
-	PhoneNo    string `sql:"phone_no"`
-	Address    string `sql:"address"`
-	Remarks    string `sql:"remarks"`
-	Status     string `sql:"status"`
-	CreatedAt  string `sql:"created_at"`
-	UpdatedAt  string `sql:"updated_at"`
 }
