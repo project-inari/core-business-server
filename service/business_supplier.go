@@ -107,3 +107,26 @@ func (s *service) InquiryBusinessSupplier(ctx context.Context, supplierID int) (
 		UpdatedAt:        supplier.UpdatedAt,
 	}, nil
 }
+
+func (s *service) CreateNewSupplierOrder(ctx context.Context, req dto.CreateNewSupplierOrderReq) (*dto.CreateNewSupplierOrderRes, error) {
+	supplierOrderID, err := s.databaseRepository.CreateNewSupplierOrder(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.CreateNewSupplierOrderRes{
+		SupplierOrderID: supplierOrderID,
+		Success:         true,
+	}, nil
+}
+
+func (s *service) ListSupplierOrders(ctx context.Context, businessID int) (*dto.ListSupplierOrdersRes, error) {
+	queryRes, err := s.databaseRepository.ListSupplierOrders(ctx, businessID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.ListSupplierOrdersRes{
+		SupplierOrders: queryRes,
+	}, nil
+}

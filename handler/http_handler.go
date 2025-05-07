@@ -269,3 +269,68 @@ func (h *httpHandler) InquiryBusinessProduct(c echo.Context) error {
 
 	return response.SuccessResponse(c, http.StatusOK, res)
 }
+
+func (h *httpHandler) CreateNewSupplierOrder(c echo.Context) error {
+	ctx := c.Request().Context()
+	wrapper := request.ContextWrapper(c)
+
+	req := new(dto.CreateNewSupplierOrderReq)
+	if err := wrapper.Bind(req); err != nil {
+		return response.ErrorResponse(c, http.StatusBadRequest, fmt.Sprintf("error - [CreateNewSupplierOrder] bad request: %v", err), "")
+	}
+
+	res, err := h.d.Service.CreateNewSupplierOrder(ctx, *req)
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [CreateNewSupplierOrder] internal server error: %v", err), "")
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}
+
+func (h *httpHandler) ListSupplierOrders(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	businessID := c.Param("businessID")
+	if businessID == "" {
+		return response.ErrorResponse(c, http.StatusBadRequest, "error - [ListBusinessProducts] bad request: business name is required", "")
+	}
+
+	res, err := h.d.Service.ListSupplierOrders(ctx, utils.ConvertStringToInt(businessID))
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [ListSupplierOrders] internal server error: %v", err), "")
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}
+
+func (h *httpHandler) ListBusinessInventory(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	businessID := c.Param("businessID")
+	if businessID == "" {
+		return response.ErrorResponse(c, http.StatusBadRequest, "error - [ListBusinessInventory] bad request: business name is required", "")
+	}
+
+	res, err := h.d.Service.ListBusinessInventory(ctx, utils.ConvertStringToInt(businessID))
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [ListBusinessInventory] internal server error: %v", err), "")
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}
+
+func (h *httpHandler) InquiryProductInventory(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	variantID := c.Param("variantID")
+	if variantID == "" {
+		return response.ErrorResponse(c, http.StatusBadRequest, "error - [InquiryProductInventory] bad request: variant ID is required", "")
+	}
+
+	res, err := h.d.Service.InquiryProductInventory(ctx, utils.ConvertStringToInt(variantID))
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [InquiryProductInventory] internal server error: %v", err), "")
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}

@@ -256,6 +256,7 @@ CREATE TABLE `tbl_supplier_orders` (
   `receive_id` varchar(50) DEFAULT NULL,
   `business_id` int NOT NULL,
   `supplier_id` int NOT NULL,
+  `warehouse_id` int NOT NULL,
   `status` varchar(50) DEFAULT NULL,
   `shipping_method` varchar(100) DEFAULT NULL,
   `shipping_cost` decimal(10,2) DEFAULT NULL,
@@ -265,7 +266,8 @@ CREATE TABLE `tbl_supplier_orders` (
   UNIQUE KEY `unique_receive_id` (`business_id`,`receive_id`),
   KEY `supplier_id` (`supplier_id`),
   CONSTRAINT `tbl_supplier_orders_ibfk_1` FOREIGN KEY (`business_id`) REFERENCES `tbl_businesses` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `tbl_supplier_orders_ibfk_2` FOREIGN KEY (`supplier_id`) REFERENCES `tbl_suppliers` (`id`) ON DELETE CASCADE
+  CONSTRAINT `tbl_supplier_orders_ibfk_2` FOREIGN KEY (`supplier_id`) REFERENCES `tbl_suppliers` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tbl_supplier_orders_ibfk_3` FOREIGN KEY (`warehouse_id`) REFERENCES `tbl_warehouses` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 

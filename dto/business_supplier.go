@@ -55,3 +55,52 @@ type BusinessSupplierContactModel struct {
 	CreatedAt  string `json:"createdAt"`
 	UpdatedAt  string `json:"updatedAt"`
 }
+
+type CreateNewSupplierOrderReq struct {
+	BusinessID         int                 `json:"businessId" validate:"required"`
+	SupplierID         int                 `json:"supplierId" validate:"required"`
+	ReceiveID          string              `json:"receiveId" validate:"required"`
+	WarehouseID        int                 `json:"warehouseId" validate:"required"`
+	Status             string              `json:"status" validate:"required"`
+	ShippingMethod     string              `json:"shippingMethod" validate:"required"`
+	ShippingCost       float64             `json:"shippingCost" validate:"required"`
+	SupplierOrderItems []SupplierOrderItem `json:"supplierOrderItems" validate:"required"`
+}
+
+type CreateNewSupplierOrderRes struct {
+	SupplierOrderID int  `json:"supplierOrderId"`
+	Success         bool `json:"success"`
+}
+
+type SupplierOrderItem struct {
+	VariantID int `json:"variantId" validate:"required"`
+	Quantity  int `json:"quantity" validate:"required"`
+}
+
+type ListSupplierOrdersRes struct {
+	SupplierOrders []SupplierOrderModel `json:"supplierOrders"`
+}
+
+type SupplierOrderModel struct {
+	ID             int                      `json:"id"`
+	ReceiveID      string                   `json:"receiveId"`
+	SupplierID     int                      `json:"supplierId"`
+	WarehouseID    int                      `json:"warehouseId"`
+	Status         string                   `json:"status"`
+	ShippingMethod string                   `json:"shippingMethod"`
+	ShippingCost   float64                  `json:"shippingCost"`
+	OrderItems     []SupplierOrderItemModel `json:"orderItems"`
+	CreatedAt      string                   `json:"createdAt"`
+	UpdatedAt      string                   `json:"updatedAt"`
+}
+
+type SupplierOrderItemModel struct {
+	VariantID         int     `json:"variantId"`
+	ProductName       string  `json:"productName"`
+	VariantName       string  `json:"variantName"`
+	SKUNo             string  `json:"skuNo"`
+	BasePurchasePrice float64 `json:"basePurchasePrice"`
+	PictureURL        string  `json:"pictureUrl"`
+	CategoryID        int     `json:"categoryId"`
+	Quantity          int     `json:"quantity"`
+}

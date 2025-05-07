@@ -118,3 +118,32 @@ type BusinessProductVariantTagEntity struct {
 	VariantID int `sql:"variant_id"`
 	TagID     int `sql:"tag_id"`
 }
+
+type BusinessInventoryEntity struct {
+	ID          int    `sql:"id"`
+	BusinessID  int    `sql:"business_id"`
+	WarehouseID int    `sql:"warehouse_id"`
+	VariantID   int    `sql:"variant_id"`
+	Quantity    int    `sql:"quantity"`
+	CreatedAt   string `sql:"created_at"`
+	UpdatedAt   string `sql:"updated_at"`
+}
+
+type BusinessSupplierOrderEntity struct {
+	ID             int     `sql:"id"`
+	BusinessID     int     `sql:"business_id"`
+	SupplierID     int     `sql:"supplier_id"`
+	ReceiveID      int     `sql:"receive_id"`
+	Status         string  `sql:"status"`
+	ShippingCost   float64 `sql:"shipping_cost"`
+	ShippingMethod string  `sql:"shipping_method"`
+	CreatedAt      string  `sql:"created_at"`
+	UpdatedAt      string  `sql:"updated_at"`
+}
+
+type BusinessSupplierOrderProductEntity struct {
+	SupplierOrderID int     `sql:"supplier_order_id"`
+	VariantID       int     `sql:"variant_id"`
+	Quantity        int     `sql:"quantity"`
+	PricePerUnit    float64 `sql:"price_per_unit"`
+}
