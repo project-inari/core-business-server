@@ -24,6 +24,7 @@ func (s *service) CreateNewProduct(ctx context.Context, req dto.CreateNewProduct
 			BaseSellingPrice:  variant.BaseSellingPrice,
 			BasePurchasePrice: variant.BasePurchasePrice,
 			Note:              variant.Note,
+			TagIDs:            &variant.TagIds,
 		}
 		variantEntities = append(variantEntities, variantEntity)
 	}
@@ -158,5 +159,40 @@ func (s *service) InquiryBusinessProduct(ctx context.Context, productID int) (*d
 		Variants:   variantModels,
 		CreatedAt:  product.CreatedAt,
 		UpdatedAt:  product.UpdatedAt,
+	}, nil
+}
+
+func (s *service) InquiryBusinessProductVariant(ctx context.Context, variantID int) (*dto.BusinessVariantModel, error) {
+	variant, err := s.databaseRepository.InquiryBusinessProductVariant(ctx, variantID)
+	if err != nil {
+		return nil, err
+	}
+
+	qtyInWarehouse, err := s.databaseRepository.ListProductVariantsInWarehouse(ctx, variant.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	variantTagIds, err := s.databaseRepository.ListProductVariantTags(ctx, variant.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	var tagIds []int
+	for _, tag := range variantTagIds {
+		tagIds = append(tagIds, tag.TagID)
+	}
+
+	return &dto.BusinessVariantModel{
+		ID:                variant.ID,
+		ProductID:         variant.ProductID,
+		VariantName:       variant.VariantName,
+		SKUNo:             variant.SKUNo,
+		PictureURL:        variant.PictureURL,
+		BaseSellingPrice:  variant.BaseSellingPrice,
+		BasePurchasePrice: variant.BasePurchasePrice,
+		Note:              variant.Note,
+		TagIds:            tagIds,
+		QtyInWarehouse:    qtyInWarehouse,
 	}, nil
 }

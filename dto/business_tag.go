@@ -1,9 +1,10 @@
 package dto
 
 type CreateNewTagReq struct {
-	BusinessID int    `json:"businessId" validate:"required"`
-	TagName    string `json:"tagName" validate:"required"`
-	Color      string `json:"color" validate:"required"`
+	BusinessID  int    `json:"businessId" validate:"required"`
+	TagName     string `json:"tagName" validate:"required"`
+	Color       string `json:"color" validate:"required"`
+	Description string `json:"description" validate:"required"`
 }
 
 type CreateNewTagRes struct {
@@ -16,10 +17,11 @@ type ListBusinessTagsRes struct {
 }
 
 type BusinessTagModel struct {
-	ID         int    `json:"id"`
-	BusinessID *int   `json:"businessId,omitempty"`
-	TagName    string `json:"tagName"`
-	Color      string `json:"color"`
-	CreatedAt  string `json:"createdAt"`
-	UpdatedAt  string `json:"updatedAt"`
+	ID          int    `json:"id"`
+	BusinessID  *int   `json:"businessId,omitempty"`
+	TagName     string `json:"tagName"`
+	Color       string `json:"color"`
+	Description string `json:"description"`
+	CreatedAt   string `json:"createdAt"`
+	UpdatedAt   string `json:"updatedAt"`
 }

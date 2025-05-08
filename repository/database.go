@@ -146,7 +146,7 @@ func (r *databaseRepository) CreateNewTag(ctx context.Context, entity dto.Busine
 	}
 	defer tx.Rollback() // nolint: errcheck
 
-	tagRes, err := tx.ExecContext(ctx, "INSERT INTO tbl_tags (business_id, tag_name, color) VALUES (?, ?, ?)", entity.BusinessID, entity.TagName, entity.Color)
+	tagRes, err := tx.ExecContext(ctx, "INSERT INTO tbl_tags (business_id, tag_name, color, description) VALUES (?, ?, ?, ?)", entity.BusinessID, entity.TagName, entity.Color, entity.Description)
 	if err != nil {
 		return -1, err
 	}
@@ -164,7 +164,7 @@ func (r *databaseRepository) CreateNewTag(ctx context.Context, entity dto.Busine
 }
 
 func (r *databaseRepository) ListBusinessTags(ctx context.Context, businessID int) ([]dto.BusinessTagEntity, error) {
-	rows, err := r.client.QueryContext(ctx, "SELECT id, tag_name, color, created_at, updated_at FROM tbl_tags WHERE business_id = ?", businessID)
+	rows, err := r.client.QueryContext(ctx, "SELECT id, tag_name, color, description, created_at, updated_at FROM tbl_tags WHERE business_id = ?", businessID)
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +173,7 @@ func (r *databaseRepository) ListBusinessTags(ctx context.Context, businessID in
 	var tags []dto.BusinessTagEntity
 	for rows.Next() {
 		var tag dto.BusinessTagEntity
-		if err := rows.Scan(&tag.ID, &tag.TagName, &tag.Color, &tag.CreatedAt, &tag.UpdatedAt); err != nil {
+		if err := rows.Scan(&tag.ID, &tag.TagName, &tag.Color, &tag.Description, &tag.CreatedAt, &tag.UpdatedAt); err != nil {
 			return nil, err
 		}
 		tags = append(tags, tag)
@@ -235,6 +235,25 @@ func (r *databaseRepository) CreateNewWarehouse(ctx context.Context, entity dto.
 
 	warehouseResID, err := warehouseRes.LastInsertId()
 	if err != nil {
+		return -1, err
+	}
+
+	variantIds, err := tx.QueryContext(ctx, "SELECT v.id FROM tbl_product_variants v JOIN tbl_products p ON v.product_id = p.id WHERE p.business_id = ?", entity.BusinessID)
+	if err != nil {
+		return -1, err
+	}
+
+	for variantIds.Next() {
+		var variantID int
+		if err := variantIds.Scan(&variantID); err != nil {
+			return -1, err
+		}
+		_, err := tx.ExecContext(ctx, "INSERT INTO tbl_inventory (business_id, warehouse_id, variant_id, quantity) VALUES (?, ?, ?, ?)", entity.BusinessID, warehouseResID, variantID, 0)
+		if err != nil {
+			return -1, err
+		}
+	}
+	if err := variantIds.Close(); err != nil {
 		return -1, err
 	}
 
@@ -312,7 +331,7 @@ func (r *databaseRepository) CreateNewSupplierContact(ctx context.Context, entit
 }
 
 func (r *databaseRepository) ListBusinessSuppliers(ctx context.Context, businessID int) ([]dto.BusinessSupplierEntity, error) {
-	rows, err := r.client.QueryContext(ctx, "SELECT id, business_id, name, description, created_at, updated_at FROM tbl_suppliers WHERE business_id = ?", businessID)
+	rows, err := r.client.QueryContext(ctx, "SELECT id, business_id, name, type, description, created_at, updated_at FROM tbl_suppliers WHERE business_id = ?", businessID)
 	if err != nil {
 		return nil, err
 	}
@@ -321,7 +340,7 @@ func (r *databaseRepository) ListBusinessSuppliers(ctx context.Context, business
 	var suppliers []dto.BusinessSupplierEntity
 	for rows.Next() {
 		var supplier dto.BusinessSupplierEntity
-		if err := rows.Scan(&supplier.ID, &supplier.BusinessID, &supplier.Name, &supplier.Description, &supplier.CreatedAt, &supplier.UpdatedAt); err != nil {
+		if err := rows.Scan(&supplier.ID, &supplier.BusinessID, &supplier.Name, &supplier.Type, &supplier.Description, &supplier.CreatedAt, &supplier.UpdatedAt); err != nil {
 			return nil, err
 		}
 		suppliers = append(suppliers, supplier)
@@ -390,16 +409,54 @@ func (r *databaseRepository) CreateNewProduct(ctx context.Context, product dto.B
 		return -1, err
 	}
 
+	warehouses, err := r.ListBusinessWarehouses(ctx, product.BusinessID)
+	if err != nil {
+		return -1, err
+	}
+
 	for _, variant := range variants {
-		_, err := tx.ExecContext(ctx, "INSERT INTO tbl_product_variants (product_id, variant_name, sku_no, picture_url, base_selling_price, base_purchase_price, note) VALUES (?, ?, ?, ?, ?, ?, ?)", productResID, variant.VariantName, variant.SKUNo, variant.PictureURL, variant.BaseSellingPrice, variant.BasePurchasePrice, variant.Note)
+		variantRes, err := tx.ExecContext(ctx, "INSERT INTO tbl_product_variants (product_id, variant_name, sku_no, picture_url, base_selling_price, base_purchase_price, note) VALUES (?, ?, ?, ?, ?, ?, ?)", productResID, variant.VariantName, variant.SKUNo, variant.PictureURL, variant.BaseSellingPrice, variant.BasePurchasePrice, variant.Note)
 		if err != nil {
 			return -1, err
 		}
 
-		for _, tag := range categoryTags {
-			_, err := tx.ExecContext(ctx, "INSERT INTO tbl_variant_tags (variant_id, tag_id) VALUES (?, ?)", variant.ID, tag.ID)
+		variantResID, err := variantRes.LastInsertId()
+		if err != nil {
+			return -1, err
+		}
+
+		for _, warehouse := range warehouses {
+			_, err := tx.ExecContext(ctx, "INSERT INTO tbl_inventory (business_id, warehouse_id, variant_id, quantity) VALUES (?, ?, ?, ?)", product.BusinessID, warehouse.ID, variantResID, 0)
 			if err != nil {
 				return -1, err
+			}
+		}
+
+		for _, tag := range categoryTags {
+			var exists int
+			err := tx.QueryRowContext(ctx, "SELECT COUNT(*) FROM tbl_variant_tags WHERE variant_id = ? AND tag_id = ?", variantResID, tag.ID).Scan(&exists)
+			if err != nil {
+				return -1, err
+			}
+			if exists == 0 {
+				_, err := tx.ExecContext(ctx, "INSERT INTO tbl_variant_tags (variant_id, tag_id) VALUES (?, ?)", variantResID, tag.ID)
+				if err != nil {
+					return -1, err
+				}
+			}
+		}
+
+		for _, tagID := range *variant.TagIDs {
+			var exists int
+			err := tx.QueryRowContext(ctx, "SELECT COUNT(*) FROM tbl_variant_tags WHERE variant_id = ? AND tag_id = ?", variantResID, tagID).Scan(&exists)
+			if err != nil {
+				return -1, err
+			}
+			if exists == 0 {
+				_, err := tx.ExecContext(ctx, "INSERT INTO tbl_variant_tags (variant_id, tag_id) VALUES (?, ?)", variantResID, tagID)
+				if err != nil {
+					return -1, err
+				}
 			}
 		}
 	}
@@ -874,6 +931,11 @@ func (r *databaseRepository) CreateNewCustomerOrder(ctx context.Context, orderIn
 
 	for _, item := range orderInfo.CustomerOrderItems {
 		_, err = tx.ExecContext(ctx, "INSERT INTO tbl_customer_order_products (customer_order_id, variant_id, quantity, selling_price_per_unit, discount) VALUES (?, ?, ?, ?, ?)", customerOrderResID, item.VariantID, item.Quantity, item.PricePerUnit, item.DiscountPerUnit)
+		if err != nil {
+			return -1, err
+		}
+
+		_, err = tx.ExecContext(ctx, "UPDATE tbl_inventory SET quantity = quantity - ? WHERE warehouse_id = ? AND variant_id = ?", item.Quantity, item.WarehouseID, item.VariantID)
 		if err != nil {
 			return -1, err
 		}

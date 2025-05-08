@@ -25,6 +25,7 @@ type Port interface {
 	CreateNewProduct(ctx context.Context, req dto.CreateNewProductReq) (*dto.CreateNewProductRes, error)
 	ListBusinessProducts(ctx context.Context, businessID int) (*dto.ListBusinessProductsRes, error)
 	InquiryBusinessProduct(ctx context.Context, productID int) (*dto.BusinessProductModel, error)
+	InquiryBusinessProductVariant(ctx context.Context, variantID int) (*dto.BusinessVariantModel, error)
 	CreateNewSupplierOrder(ctx context.Context, req dto.CreateNewSupplierOrderReq) (*dto.CreateNewSupplierOrderRes, error)
 	ListSupplierOrders(ctx context.Context, businessID int) (*dto.ListSupplierOrdersRes, error)
 	ListBusinessInventory(ctx context.Context, businessID int) (*dto.ListBusinessInventoryRes, error)

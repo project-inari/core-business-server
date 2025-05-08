@@ -35,6 +35,7 @@ func (h *httpHandler) initRoutes(e *echo.Echo) {
 	v1Product.POST("/create", h.CreateNewProduct)
 	v1Product.GET("/list/:businessID", h.ListBusinessProducts)
 	v1Product.GET("/inquiry/:productID", h.InquiryBusinessProduct)
+	v1Product.GET("/variant/inquiry/:variantID", h.InquiryBusinessProductVariant)
 
 	v1Inventory := v1.Group("/inventory")
 	v1Inventory.GET("/list/:businessID", h.ListBusinessInventory)

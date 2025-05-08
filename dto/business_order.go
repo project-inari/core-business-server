@@ -19,6 +19,7 @@ type CreateNewCustomerOrderRes struct {
 
 type CustomerOrderItem struct {
 	VariantID       int     `json:"variantId" validate:"required"`
+	WarehouseID     int     `json:"warehouseId" validate:"required"`
 	Quantity        int     `json:"quantity" validate:"required"`
 	PricePerUnit    float64 `json:"pricePerUnit" validate:"required"`
 	DiscountPerUnit float64 `json:"discountPerUnit" validate:"required"`

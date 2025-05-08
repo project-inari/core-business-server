@@ -49,12 +49,13 @@ type BusinessCategoryEntity struct {
 }
 
 type BusinessTagEntity struct {
-	ID         int    `sql:"id"`
-	BusinessID int    `sql:"business_id"`
-	TagName    string `sql:"tag_name"`
-	Color      string `sql:"color"`
-	CreatedAt  string `sql:"created_at"`
-	UpdatedAt  string `sql:"updated_at"`
+	ID          int    `sql:"id"`
+	BusinessID  int    `sql:"business_id"`
+	TagName     string `sql:"tag_name"`
+	Color       string `sql:"color"`
+	Description string `sql:"description"`
+	CreatedAt   string `sql:"created_at"`
+	UpdatedAt   string `sql:"updated_at"`
 }
 
 type BusinessWarehouseEntity struct {
@@ -110,6 +111,7 @@ type BusinessProductVariantEntity struct {
 	BaseSellingPrice  float64 `sql:"base_selling_price"`
 	BasePurchasePrice float64 `sql:"base_purchase_price"`
 	Note              string  `sql:"note"`
+	TagIDs            *[]int
 	CreatedAt         string  `sql:"created_at"`
 	UpdatedAt         string  `sql:"updated_at"`
 }

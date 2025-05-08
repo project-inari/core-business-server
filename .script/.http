@@ -51,8 +51,9 @@ POST http://localhost:8080/v1/tag/create
 Content-Type: application/json
 {
     "businessId": 1,
-    "tagName": "testtag2",
-    "color": "red"
+    "tagName": "testtag3",
+    "color": "red",
+    "description": "This is a test tag"
 }
 
 GET http://localhost:8080/v1/tag/list/1
@@ -116,33 +117,36 @@ Content-Type: application/json
 {
     "businessId": 1,
     "supplierId": 1,
-    "name": "testprod1",
+    "name": "testprod2",
     "brand": "testbrand1",
-    "categoryId": 1,
+    "categoryId": 2,
     "variants": [
         {
-            "variantName": "testvar1",
-            "skuNo": "1",
+            "variantName": "testvar11",
+            "skuNo": "11",
             "pictureUrl": "https://www.google.com",
             "baseSellingPrice": 100,
             "basePurchasePrice": 50,
-            "note": "This is a test variant 1"
+            "note": "This is a test variant 11",
+            "tagIds": [1]
         },
         {
-            "variantName": "testvar2",
-            "skuNo": "2",
+            "variantName": "testvar21",
+            "skuNo": "21",
             "pictureUrl": "https://www.google.com",
             "baseSellingPrice": 200,
             "basePurchasePrice": 100,
-            "note": "This is a test variant 2"
+            "note": "This is a test variant 21",
+            "tagIds": [1, 2]
         },
         {
-            "variantName": "testvar3",
-            "skuNo": "3",
+            "variantName": "testvar31",
+            "skuNo": "31",
             "pictureUrl": "https://www.google.com",
             "baseSellingPrice": 300,
             "basePurchasePrice": 150,
-            "note": "This is a test variant 3"
+            "note": "This is a test variant 31",
+            "tagIds": [1, 3]
         }
     ]
 }
@@ -151,6 +155,9 @@ GET http://localhost:8080/v1/product/list/1
 Content-Type: application/json
 
 GET http://localhost:8080/v1/product/inquiry/1
+Content-Type: application/json
+
+POST http://localhost:8080/v1/product/variant/inquiry/1
 Content-Type: application/json
 
 POST http://localhost:8080/v1/supplier/order/create
@@ -215,18 +222,21 @@ Content-Type: application/json
     "customerOrderItems": [
         {
             "variantId": 1,
+            "warehouseId": 1,
             "quantity": 10,
             "pricePerUnit": 100,
             "discountPerUnit": 0
         },
         {
             "variantId": 2,
+            "warehouseId": 1,
             "quantity": 20,
             "pricePerUnit": 200,
             "discountPerUnit": 20
         },
         {
             "variantId": 3,
+            "warehouseId": 1,
             "quantity": 30,
             "pricePerUnit": 300,
             "discountPerUnit": 30

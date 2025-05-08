@@ -125,6 +125,7 @@ CREATE TABLE `tbl_tags` (
   `business_id` int NOT NULL,
   `tag_name` varchar(100) NOT NULL,
   `color` varchar(50) DEFAULT NULL,
+  `description` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

@@ -8,9 +8,10 @@ import (
 
 func (s *service) CreateNewTag(ctx context.Context, req dto.CreateNewTagReq) (*dto.CreateNewTagRes, error) {
 	tagEntity := dto.BusinessTagEntity{
-		BusinessID: req.BusinessID,
-		TagName:    req.TagName,
-		Color:      req.Color,
+		BusinessID:  req.BusinessID,
+		TagName:     req.TagName,
+		Color:       req.Color,
+		Description: req.Description,
 	}
 
 	tagID, err := s.databaseRepository.CreateNewTag(ctx, tagEntity)
@@ -33,11 +34,12 @@ func (s *service) ListBusinessTags(ctx context.Context, businessID int) (*dto.Li
 	var tags []dto.BusinessTagModel
 	for _, tag := range queryRes {
 		tags = append(tags, dto.BusinessTagModel{
-			ID:      tag.ID,
-			TagName: tag.TagName,
-			Color:   tag.Color,
-			CreatedAt: tag.CreatedAt,
-			UpdatedAt: tag.UpdatedAt,
+			ID:          tag.ID,
+			TagName:     tag.TagName,
+			Color:       tag.Color,
+			Description: tag.Description,
+			CreatedAt:   tag.CreatedAt,
+			UpdatedAt:   tag.UpdatedAt,
 		})
 	}
 

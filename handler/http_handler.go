@@ -270,6 +270,22 @@ func (h *httpHandler) InquiryBusinessProduct(c echo.Context) error {
 	return response.SuccessResponse(c, http.StatusOK, res)
 }
 
+func (h *httpHandler) InquiryBusinessProductVariant(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	variantID := c.Param("variantID")
+	if variantID == "" {
+		return response.ErrorResponse(c, http.StatusBadRequest, "error - [InquiryBusinessProductVariant] bad request: variant ID is required", "")
+	}
+
+	res, err := h.d.Service.InquiryBusinessProductVariant(ctx, utils.ConvertStringToInt(variantID))
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, fmt.Sprintf("error - [InquiryBusinessProductVariant] internal server error: %v", err), "")
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, res)
+}
+
 func (h *httpHandler) CreateNewSupplierOrder(c echo.Context) error {
 	ctx := c.Request().Context()
 	wrapper := request.ContextWrapper(c)
